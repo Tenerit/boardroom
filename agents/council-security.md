@@ -26,7 +26,9 @@ Look through the security lens:
 Be concrete: cite `file:line`. Rank by real exploitability in *this* app, not
 theoretical CWE bingo. Note when a "scary" pattern is actually safe and why.
 
-Return **exactly** this format and nothing after it:
+**Token economy:** navigate by the chair's project map — go straight to the files in your lane, don't re-derive the structure or re-read what the brief already states. Read only what you need (aim ≤12 files); cite specifics, never paste whole files back.
+
+Return **exactly** the block below and **nothing else** — no preamble, no "Now I have a picture…" lead-in. Start your reply directly with the `##` header:
 
 ## Security verdict
 **Score:** X/10 — <one-line judgement of the security posture>

@@ -75,12 +75,29 @@ clean.
 
 ## How it works
 
-`/council:review` is a skill that acts as the **chair**: it does a light recon
-pass to write a shared ≤150-word brief, then launches every selected hat as a
-parallel subagent with that brief, collects the seven verdicts, and synthesizes
-them. Each subagent runs in its own context window, so the hats don't contaminate
-each other — and you pay for focused analysis, not one model trying to wear seven
-hats at once.
+`/council:review` is a skill that acts as the **chair**: it does one recon pass
+to build a shared **project map** (brief + annotated key-file list), then launches
+every selected hat as a parallel subagent with that map, collects the verdicts,
+and synthesizes them. Each subagent runs in its own context window, so the hats
+don't contaminate each other — and you pay for focused analysis, not one model
+trying to wear seven hats at once.
+
+## Cost & performance
+
+Multi-agent reviews are token-hungry by nature. council is built to spend the
+minimum:
+
+- **Recon once, not N times.** The chair builds the project map a single time and
+  hands it to every hat. Without it, all seven hats re-read the README, re-walk
+  the tree, and re-open the same core files — the same duplicate-read waste your
+  own sessions accumulate. The map is the biggest lever.
+- **Read budget.** Each hat is told to navigate by the map, open only the files in
+  its lane (aim ≤12), and cite specifics instead of pasting whole files back.
+- **Model tiering.** Deep-code hats (architect, security, SRE, skeptic) `inherit`
+  your session model; judgment hats (UX, product, investor) default to a lighter
+  model where surface reading is enough. Override any hat's `model:` frontmatter.
+- **Run a subset.** `--hats=security,sre` on a focused pass costs a fraction of
+  the full panel. Right-size to the project.
 
 ## License
 
