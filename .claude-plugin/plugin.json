@@ -5,7 +5,7 @@
   "author": {
     "name": "boardroom contributors"
   },
-  "homepage": "https://github.com/REPLACE_ME/boardroom",
+  "homepage": "https://github.com/Tenerit/boardroom",
   "license": "MIT",
   "keywords": ["review", "decision", "due-diligence", "architecture", "security", "product", "investor", "subagents", "go-no-go"]
 }
