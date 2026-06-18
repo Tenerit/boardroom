@@ -1,0 +1,11 @@
+{
+  "name": "council",
+  "description": "Review any project through a panel of expert hats (architect, security, SRE, UX, PM, investor, skeptic) in parallel, then reconcile their verdicts into one prioritized report — including where the experts disagree.",
+  "version": "0.1.0",
+  "author": {
+    "name": "council contributors"
+  },
+  "homepage": "https://github.com/REPLACE_ME/council",
+  "license": "MIT",
+  "keywords": ["review", "analysis", "architecture", "security", "product", "subagents"]
+}
