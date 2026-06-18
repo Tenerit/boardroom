@@ -1,38 +1,55 @@
-# council — review any project through a panel of expert hats
+# boardroom — a whole-project review board for Claude Code
 
-Most reviews give you one perspective. `council` convenes a **panel** — architect,
-security, SRE, UX, product, investor, and a skeptic — sends each one into the
-codebase **in parallel** through its own lens, then **reconciles their verdicts**
-into a single decision-grade report.
+Most reviews tell you whether the code is good. **boardroom tells you whether the
+*project* is good** — and gives you a decision.
 
-The differentiator isn't the personas (anyone can prompt "review as a security
-expert"). It's the **synthesis**: where the hats *agree* (fix first), where they
-*conflict* (a human must decide), and one prioritized action list across all of
-them. A council that always agrees is worthless — this one keeps the disagreement.
+`/boardroom:review` convenes a board of expert hats — architect, security, SRE,
+UX, product, investor, and a skeptic — sends each into your project **in parallel**
+through its own lens, then delivers:
+
+- a **GO / NO-GO decision** (SHIP · SHIP WITH FIXES · NOT YET · NEEDS PROOF), and
+- the **cross-discipline trade-offs you have to resolve** — the calls with no
+  correct answer (ship now vs harden first, scope vs simplicity, growth vs
+  compliance).
 
 ```
-/council:review
-/council:review src/
-/council:review --hats=security,sre
-/council:review --hats=investor,pm marketing-site/
+/boardroom:review
+/boardroom:review src/
+/boardroom:review --hats=security,sre
+/boardroom:review --debate          # add a rebuttal round on the conflicts
 ```
+
+## How this is different
+
+There are already good multi-agent reviewers for Claude Code. boardroom sits where
+they don't:
+
+| | Code-review panels (e.g. roundtable, official code-review) | Multi-**model** councils (Gemini/GPT/Grok) | **boardroom** |
+| --- | --- | --- | --- |
+| Reviews | a diff / code quality | a question, across vendors | the **whole project** |
+| Hats | engineering only | one per model | **engineering + business** (investor, product, UX) |
+| Output | findings / a merge verdict | side-by-side answers | a **GO/NO-GO decision** |
+| Disagreement | a judge picks the right answer | consensus vs divergence | **surfaced as a decision *you* make** — because business trade-offs have no right answer |
+
+A code reviewer can adjudicate "is this correct?" The board's job is the question
+no judge can settle: *"is this worth shipping / buying / trusting — and what do we
+trade off to get there?"*
 
 ## What you get
 
 ```
-# Council review — <project>
+# Boardroom review — <project>
 
-<chair's one-paragraph summary>
-
-## Readiness scorecard      ← each hat's score + one-liner
-## Consensus                ← flagged by 2+ hats — fix first
-## Conflicts                ← where experts disagree — needs a human call
-## Top risks                ← ranked
-## Prioritized actions      ← effort × impact, in order
-## Hard questions           ← the things the team can't currently answer
+## Decision: SHIP WITH FIXES         ← the headline call + what's gating it
+## Decisions for you                 ← cross-discipline trade-offs you must resolve
+## Scorecard                         ← each hat's score + one-liner
+## Consensus                         ← flagged by 2+ hats — do first
+## Top risks                         ← ranked
+## Prioritized actions               ← effort × impact
+## Hard questions                    ← what the team can't currently answer
 ```
 
-## The panel
+## The board
 
 | Hat | Lens |
 | --- | --- |
@@ -44,60 +61,51 @@ them. A council that always agrees is worthless — this one keeps the disagreem
 | **Investor** | moat, market, traction, kill-risks |
 | **Skeptic** | red-teams the headline claim and the load-bearing assumptions |
 
-Every hat is **read-only** — the council diagnoses, it never edits your code.
+Every hat is **read-only** — the board diagnoses, it never edits your code.
 
 ## Install
 
 ```bash
-# try it without installing
-claude --plugin-dir ./council
-
-# then in the session
-/council:review
+claude --plugin-dir ./boardroom    # then, in the session:
+/boardroom:review
 ```
 
-To distribute via a marketplace, see the Claude Code plugin docs. The hats are
-just markdown files in `agents/` — see "Customize" below.
+## Smart panel assembly
 
-## Customize the panel
+The chair classifies the project and seats only the hats that fit — a throwaway
+script gets architect + skeptic; a SaaS product gets the full board; a library
+skips the investor unless you ask. Force a panel with `--hats=architect,security`.
 
-- **Add a hat:** drop a new `agents/council-<role>.md` (copy an existing one,
-  change the lens + the verdict header), then add it to the table in
-  `skills/review/SKILL.md`. Examples worth adding: `council-cost` (token/$$ —
-  pairs well with [ccx](https://github.com/REPLACE_ME/ccx)), `council-legal`,
-  `council-data` (privacy/compliance), `council-perf`.
-- **Run a subset:** `--hats=architect,security`.
-- **Drop a hat:** delete its file and its table row.
+## The `--debate` round
 
-Each hat returns the same verdict contract (score · strengths · severity-tagged
-risks · top-3 actions · one hard question), which is what makes the synthesis
-clean.
-
-## How it works
-
-`/council:review` is a skill that acts as the **chair**: it does one recon pass
-to build a shared **project map** (brief + annotated key-file list), then launches
-every selected hat as a parallel subagent with that map, collects the verdicts,
-and synthesizes them. Each subagent runs in its own context window, so the hats
-don't contaminate each other — and you pay for focused analysis, not one model
-trying to wear seven hats at once.
+By default each hat reviews independently (one parallel pass). Add `--debate` for
+one extra **rebuttal round**: each hat sees only the *conflicting* findings and
+gets ≤3 lines to defend, concede, or refine. It sharpens the trade-offs without
+re-reviewing the whole project — cheap, scoped to the disagreements.
 
 ## Cost & performance
 
-Multi-agent reviews are token-hungry by nature. council is built to spend the
-minimum:
+Multi-agent reviews are token-hungry; boardroom spends the minimum:
 
 - **Recon once, not N times.** The chair builds the project map a single time and
-  hands it to every hat. Without it, all seven hats re-read the README, re-walk
-  the tree, and re-open the same core files — the same duplicate-read waste your
-  own sessions accumulate. The map is the biggest lever.
-- **Read budget.** Each hat is told to navigate by the map, open only the files in
-  its lane (aim ≤12), and cite specifics instead of pasting whole files back.
-- **Model tiering.** Deep-code hats (architect, security, SRE, skeptic) `inherit`
-  your session model; judgment hats (UX, product, investor) default to a lighter
-  model where surface reading is enough. Override any hat's `model:` frontmatter.
-- **Run a subset.** `--hats=security,sre` on a focused pass costs a fraction of
-  the full panel. Right-size to the project.
+  hands it to every hat, so seven reviewers don't each re-read the README and
+  re-walk the tree.
+- **Read budget.** Each hat navigates by the map, opens only its lane (aim ≤12
+  files), and cites instead of pasting whole files.
+- **Model tiering.** Deep-code hats `inherit` your session model; judgment hats
+  (UX, product, investor) default to a lighter model. Override any hat's `model:`.
+- **Right-sized panel + subsets.** Smart assembly and `--hats=` keep focused runs
+  cheap.
+
+## Customize the board
+
+Hats are just markdown subagents in `agents/`. Add one (copy an existing
+`board-*.md`, change the lens + verdict header, add it to the table in
+`skills/review/SKILL.md`). Worth adding: `board-cost` (token/$$ — pairs with a
+cost analyzer), `board-legal`, `board-data` (privacy/compliance), `board-perf`.
+Each hat returns the same verdict contract (score · strengths · severity-tagged
+risks · top-3 actions · cross-discipline flag · one hard question), which is what
+makes the decision synthesis clean.
 
 ## License
 

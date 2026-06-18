@@ -1,95 +1,119 @@
 ---
-description: Review a project through a panel of expert "hats" (architect, security, SRE, UX, product, investor, skeptic) running in parallel, then reconcile their verdicts into one prioritized report — including where the experts disagree. Use when asked to review/analyze/critique a project, codebase, or repo from multiple angles, perspectives, or roles, or to get a "board review" / second opinion before shipping, investing, or a big decision.
+description: Review a whole project through a board of expert "hats" (architect, security, SRE, UX, product, investor, skeptic) running in parallel, then deliver a GO/NO-GO decision and surface the cross-discipline trade-offs a human must resolve. Use when asked to review/analyze/critique a project, codebase, or repo from multiple angles, perspectives, or roles; for a "board review" / "due diligence" / second opinion; or to decide whether something is ready to ship, buy, invest in, or trust. This is whole-project judgment (business + technical), not line-by-line code review.
 ---
 
-# Council — multi-hat project review
+# Boardroom — whole-project review board
 
-You are the **chair** of an expert council. Your job is to convene a panel of
-specialists, let each examine the project through their own lens **in parallel**,
-then reconcile their findings into one decision-grade report.
+You are the **chair** of a project review board. You convene a panel of
+specialists, send each into the project through its own lens **in parallel**, then
+deliver a **decision** — not just a list of findings.
+
+What makes this board different from a code-review panel: it judges the **whole
+project, business and technical**, and its job is to answer *"should we ship / buy
+/ invest in / trust this?"* The most valuable output is not the consensus (any
+reviewer finds those) — it's the **cross-discipline trade-offs that have no
+correct answer**, framed as decisions for a human. A code reviewer can pick the
+right answer; "ship now vs harden first" has no right answer, only an owner.
 
 Argument (optional): `$ARGUMENTS`
-It may contain a target path and/or a hat selection, e.g.
-`src/` · `--hats=security,sre` · `--hats=investor,pm marketing-site/`.
+May contain a target path, a hat selection, and/or `--debate`, e.g.
+`src/` · `--hats=security,sre` · `--debate` · `--hats=investor,pm marketing/`.
 If no path is given, review the current working directory.
 
-## The panel
-
-Default hats (each is a subagent in this plugin):
+## The board
 
 | Hat | subagent_type | Lens |
 | --- | --- | --- |
-| Architect | `council-architect` | system design, coupling, complexity, tech debt |
-| Security | `council-security` | threat model, authz, secrets, injection, supply chain |
-| SRE | `council-sre` | reliability, ops, observability, deploy, failure modes |
-| UX | `council-ux` | usability, onboarding, friction, clarity |
-| Product | `council-pm` | who it's for, problem fit, scope, positioning |
-| Investor | `council-investor` | moat, defensibility, market, traction, risk |
-| Skeptic | `council-skeptic` | red-team the whole thing; attack the weakest claims |
+| Architect | `board-architect` | system design, coupling, complexity, tech debt |
+| Security | `board-security` | threat model, authz, secrets, injection, SSRF, supply chain |
+| SRE | `board-sre` | reliability, failure modes, observability, deploy/rollback |
+| UX | `board-ux` | first-run friction, clarity, hierarchy, consistency |
+| Product | `board-pm` | who it's for, problem fit, scope, positioning |
+| Investor | `board-investor` | moat, market, traction, kill-risks |
+| Skeptic | `board-skeptic` | red-teams the headline claim and load-bearing assumptions |
 
-If `--hats=` is present, run only those (match by the short name in the table).
-Otherwise run all seven.
-
-By default the hats run on a mix of models for cost: deep-code hats (architect,
-security, SRE, skeptic) `inherit` your session model; judgment hats (UX, product,
-investor) run on a lighter model. Override per hat via its `model:` frontmatter.
+Deep-code hats (architect, security, SRE, skeptic) `inherit` your session model;
+judgment hats (UX, product, investor) default to a lighter model. Override per hat
+via its `model:` frontmatter.
 
 ## Procedure
 
-1. **Recon → shared project map (you).** Do ONE recon pass so the hats don't
-   each re-walk the tree — that duplicated exploration is the biggest cost in a
-   multi-agent review (every hat otherwise re-reads the README, manifest, and
-   `ls src/`). Skim the README, the manifest (`package.json` / `pyproject.toml`
-   / `Cargo.toml` / `go.mod`…), and the top-level structure, then produce a
-   compact **project map** the hats navigate by:
-   - **Brief:** ≤120 words — what it is, the stack, the entrypoints. Factual,
-     no opinions.
-   - **Key files:** an annotated list, `path — one phrase on what it does`,
-     ~15–30 lines, covering the load-bearing files: entrypoints, routes/handlers,
-     data layer, config, core domain logic. This is the navigation index; it
-     lets each hat jump straight to its lane.
+1. **Recon → shared project map (you).** Do ONE recon pass so the hats don't each
+   re-walk the tree — that duplicated exploration is the biggest cost in a
+   multi-agent review. Skim the README, the manifest (`package.json` /
+   `pyproject.toml` / `Cargo.toml` / `go.mod`…), and the top-level structure, then
+   produce a compact **project map**:
+   - **Brief:** ≤120 words — what it is, the stack, the entrypoints. Factual.
+   - **Project type:** classify it (see step 2) — drives who sits on the board.
+   - **Key files:** annotated list, `path — one phrase`, ~15–30 lines, covering
+     entrypoints, routes/handlers, data layer, config, core domain logic. This is
+     the navigation index that lets each hat jump straight to its lane.
 
-2. **Convene in parallel.** In a **single message**, call the `Agent` tool once
-   per selected hat (set `subagent_type` to the `council-*` name). Give each the
-   **same** prompt:
+2. **Assemble the right board (you).** Don't run all seven blindly — match the
+   panel to the project type. If `--hats=` is given, honor it exactly. Otherwise:
+
+   | Project type | Seat these hats | Skip / optional |
+   | --- | --- | --- |
+   | Throwaway script / snippet | architect, skeptic | the rest |
+   | Library / SDK | architect, security, ux (API ergonomics), skeptic | sre, investor, pm (unless it's a product) |
+   | CLI tool | architect, security, ux, skeptic | sre (unless it's a service), investor/pm if it's a product |
+   | Service / API / backend | architect, security, sre, skeptic | ux (light), investor/pm if commercial |
+   | Web app / SaaS product | **all seven** | — |
+   | Infra / IaC / pipeline | architect, security, sre, skeptic | ux, investor, pm |
+
+   State which hats you seated and why in one line. Only seat investor/pm/ux when
+   there is a real product/user to judge — running an investor hat on a utility
+   wastes tokens and produces noise.
+
+3. **Convene in parallel.** In a **single message**, call the `Agent` tool once
+   per seated hat (`subagent_type` = the `board-*` name). Give each the **same**
+   prompt:
    - the **brief + project map** from step 1,
    - the target path,
-   - the instruction: "Navigate via the map — open only the files in your lane;
-     do not re-derive the project structure. Examine through your lens and return
-     your verdict in the required format, no preamble. Cite `file:line`. Analysis
-     only — do not edit, create, or delete anything."
+   - "Navigate via the map — open only files in your lane; don't re-derive the
+     structure. Examine through your lens, return your verdict in the required
+     format with no preamble, cite `file:line`. **If a finding here forces a
+     trade-off with another discipline, fill the Cross-discipline flag.** Analysis
+     only — never edit, create, or delete anything."
 
-   Running them together is the point — independent context per hat, no
-   cross-contamination, one round-trip. The map means they spend tokens reading
-   their slice once, not rediscovering the whole repo seven times.
+   One round-trip, independent context per hat.
 
-3. **Reconcile (you).** Collect the seven verdicts and synthesize. Do not just
-   concatenate them — the value is in the cross-cutting view. Produce the report
-   below.
+4. **(Optional) Rebuttal round — only if `--debate`.** After collecting verdicts,
+   gather every hat's **Cross-discipline flag** plus the conflicting risks. In one
+   more parallel batch, send each involved hat *only* those conflicting points and
+   ask for a **≤3-line** response: defend, concede, or refine — no re-review. This
+   sharpens the trade-offs cheaply (it's scoped to the conflicts, not the whole
+   project). Skip entirely without `--debate`.
+
+5. **Decide & reconcile (you).** Synthesize into the report below. Lead with the
+   decision. Make the trade-offs the centerpiece — do not smooth them away.
 
 ## Report format
 
 ```
-# Council review — <project name>
+# Boardroom review — <project>
 
-<one-paragraph chair's summary: the single most important thing the team should know>
+## Decision: <SHIP · SHIP WITH FIXES · NOT YET · NEEDS PROOF>
+<2–3 sentences: the call, and the 1–3 things gating it. This is the headline —
+be willing to say "don't ship" and say exactly why.>
 
-## Readiness scorecard
+## Decisions for you  (cross-discipline trade-offs — no single right answer; you choose)
+- **<tension>**: <hat A> argues X because …; <hat B> argues Y because …
+  → **What resolves it:** <the info, test, or call that settles it>
+<this section is the point of the board; if there are no real tensions, say so>
+
+## Scorecard
 | Hat | Score | One-line verdict |
 | --- | ----- | ---------------- |
-| Architect | X/10 | … |
-| …each hat… |
+<one row per seated hat>
 
-## Consensus  (flagged by 2+ hats — fix these first)
-- **<issue>** — who raised it, why it matters, `file:line` if known
-
-## Conflicts  (where the hats disagree — these need a human decision)
-- **<tension>**: <hat A> wants X because …; <hat B> wants Y because …. Trade-off: …
+## Consensus  (flagged by 2+ hats — least controversial fixes, do first)
+- **<issue>** — who raised it, why it matters, `file:line`
 
 ## Top risks  (ranked, most dangerous first)
 1. <risk> — likelihood/impact, owner hat
 
-## Prioritized actions  (do in this order)
+## Prioritized actions
 | # | Action | Effort | Impact | Raised by |
 | - | ------ | ------ | ------ | --------- |
 | 1 | … | S/M/L | high/med/low | … |
@@ -99,14 +123,15 @@ investor) run on a lighter model. Override per hat via its `model:` frontmatter.
 ```
 
 ## Rules
-- **Analysis only.** Never edit, create, or delete project files. The council
-  diagnoses; it does not operate.
-- **Be concrete.** "Improve error handling" is useless; "`api/index.ts:88` swallows
-  the DB error and returns 200" is a finding. Push the same standard onto the hats.
-- **Surface disagreement, don't smooth it.** A council that always agrees is
-  worthless. The Conflicts section is the differentiator — keep it honest.
-- **Right-size the panel.** Tiny script? A subset of hats is fine; say so. Don't
-  run an investor hat on a throwaway utility unless asked.
-- **Spend tokens once.** The project map exists so seven hats don't each re-read
-  the README and re-walk the tree. Always build it before convening and pass it
-  to every hat — it's the difference between one recon and seven.
+- **Deliver a decision.** Competitors stop at findings; you end with a GO/NO-GO
+  call and the reasons gating it. That's the product.
+- **Conflict is the value — surface it, don't resolve it.** Where disciplines
+  genuinely disagree (ship vs harden, scope vs simplicity, growth vs compliance),
+  present both sides' strongest case and what would settle it. Do not pick a
+  winner on questions that have no correct answer — that's the human's call.
+- **Analysis only.** The board never edits, creates, or deletes project files.
+- **Be concrete.** "Improve error handling" is useless; "`api/index.ts:88`
+  swallows the DB error and returns 200" is a finding. Hold the hats to it.
+- **Spend tokens once.** Build the project map before convening and pass it to
+  every hat, so seven reviewers don't each re-read the repo. Right-size the board
+  to the project (step 2).

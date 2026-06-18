@@ -1,11 +1,11 @@
 {
-  "name": "council",
-  "description": "Review any project through a panel of expert hats (architect, security, SRE, UX, PM, investor, skeptic) in parallel, then reconcile their verdicts into one prioritized report — including where the experts disagree.",
-  "version": "0.2.0",
+  "name": "boardroom",
+  "description": "Convene a board of expert hats (architect, security, SRE, UX, product, investor, skeptic) over your whole project in parallel, then get a GO/NO-GO decision plus the cross-discipline trade-offs a human must resolve. Whole-project judgment — should you ship / buy / invest / trust this — not line-by-line code review.",
+  "version": "0.3.0",
   "author": {
-    "name": "council contributors"
+    "name": "boardroom contributors"
   },
-  "homepage": "https://github.com/REPLACE_ME/council",
+  "homepage": "https://github.com/REPLACE_ME/boardroom",
   "license": "MIT",
-  "keywords": ["review", "analysis", "architecture", "security", "product", "subagents"]
+  "keywords": ["review", "decision", "due-diligence", "architecture", "security", "product", "investor", "subagents", "go-no-go"]
 }
