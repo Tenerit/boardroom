@@ -31,10 +31,11 @@ If no path is given, review the current working directory.
 | Product | `board-pm` | who it's for, problem fit, scope, positioning |
 | Investor | `board-investor` | moat, market, traction, kill-risks |
 | Skeptic | `board-skeptic` | red-teams the headline claim and load-bearing assumptions |
+| Cost | `board-cost` | LLM/token spend — caching, prompt bounding, signal pre-extraction (seat only if the project calls an LLM / metered API) |
 
-Deep-code hats (architect, security, SRE, skeptic) `inherit` your session model;
-judgment hats (UX, product, investor) default to a lighter model. Override per hat
-via its `model:` frontmatter.
+Deep-code hats (architect, security, SRE, skeptic, cost) `inherit` your session
+model; judgment hats (UX, product, investor) default to a lighter model. Override
+per hat via its `model:` frontmatter.
 
 ## Procedure
 
@@ -58,8 +59,12 @@ via its `model:` frontmatter.
    | Library / SDK | architect, security, ux (API ergonomics), skeptic | sre, investor, pm (unless it's a product) |
    | CLI tool | architect, security, ux, skeptic | sre (unless it's a service), investor/pm if it's a product |
    | Service / API / backend | architect, security, sre, skeptic | ux (light), investor/pm if commercial |
-   | Web app / SaaS product | **all seven** | — |
+   | Web app / SaaS product | **the full board** | — |
    | Infra / IaC / pipeline | architect, security, sre, skeptic | ux, investor, pm |
+
+   **Plus Cost (`board-cost`):** seat it on *any* project type above whenever the
+   project itself calls an LLM or a metered API (check the manifest for
+   `openai`/`anthropic`/`ollama`/etc., or grep for a model call). Skip it otherwise.
 
    State which hats you seated and why in one line. Only seat investor/pm/ux when
    there is a real product/user to judge — running an investor hat on a utility

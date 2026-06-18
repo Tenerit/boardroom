@@ -60,8 +60,11 @@ trade off to get there?"*
 | **Product** | who it's for, problem fit, scope, positioning |
 | **Investor** | moat, market, traction, kill-risks |
 | **Skeptic** | red-teams the headline claim and the load-bearing assumptions |
+| **Cost** | LLM/token spend — caching, prompt bounding, signal pre-extraction (auto-seated only when the project calls an LLM) |
 
-Every hat is **read-only** — the board diagnoses, it never edits your code.
+Every hat is **read-only** — the board diagnoses, it never edits your code. The
+**Cost** hat is unique to boardroom — no other review panel judges what your LLM
+calls actually cost.
 
 ## Install
 
