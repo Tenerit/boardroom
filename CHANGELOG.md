@@ -15,8 +15,9 @@ this project uses [semantic versioning](https://semver.org).
   time, token cost), and the verdict. Proof, not just a fictional sample.
 - **"Who it's for"** section in the README (named ICPs / jobs-to-be-done).
 ### Changed
-- Visible scores (a 10-cell bar per hat + overall) and a **"What's solid"**
-  strengths section — a review shows what works, not only problems.
+- Scorecard table (hat / score / one-line verdict) with a leading level emoji
+  (💪 👍 ⚠️ 🚨) and the hat's identity icon, plus an overall. A **"What's solid"**
+  strengths section so a review shows what works, not only problems.
 - Cleaner, more scannable report format: scores on one line, a single ranked
   "What to fix" table (severity + "what to change" + time) replacing the separate
   scorecard/consensus/risks/actions sections. Effort is a **concrete time estimate

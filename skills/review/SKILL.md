@@ -112,10 +112,15 @@ per hat via its `model:` frontmatter.
 ## Decision: <SHIP · SHIP WITH FIXES · NOT YET · NEEDS PROOF>
 <2–3 sentences: the call + the 1–3 things gating it. Be willing to say "don't ship".>
 
-## Scores
-<one line per seated hat: emoji + name + a 10-cell bar in `inline code`
-(█ = filled up to the score, ░ = the rest) + **N/10**. Then **Overall: ~X/10**.
-The bar makes the score readable at a glance, e.g. `████████░░` for 8/10.>
+## Scorecard
+|  | Hat | Score | One-line verdict |
+| :--: | --- | :---: | ---------------- |
+| <level> | <hat icon + name> | **N/10** | <one concrete line> |
+<one row per seated hat, sorted high → low. First column = level emoji by score:
+💪 8–10 (strong) · 👍 6–7 (ok) · ⚠️ 4–5 (weak) · 🚨 0–3 (critical). Hat column =
+the hat's identity icon + name (🏛 architect · 🔒 security · 🛠 sre · 🎨 ux ·
+📦 product · 💰 investor · 🕵 skeptic · 🧮 cost). Score in bold. End with
+**Overall ~X/10**. No ASCII bars.>
 
 ## What's solid
 <2–4 genuine strengths, concrete (name the file/area), pulled from the hats'
