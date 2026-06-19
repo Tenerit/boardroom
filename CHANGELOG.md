@@ -3,6 +3,13 @@
 All notable changes to boardroom. Format follows [Keep a Changelog](https://keepachangelog.com);
 this project uses [semantic versioning](https://semver.org).
 
+## [0.5.0] — 2026-06-19
+### Added
+- **Depth modes** — `--light` (3 hats), `--standard` (5), `--deep` (full board),
+  as friendly sugar over smart panel assembly; `--hats=` still overrides.
+- **Machine-readable summary block** at the end of every report (`decision`,
+  `risk_score` 0–100, `top_3_blockers`) so reviews are comparable across projects.
+
 ## [0.4.0] — 2026-06-18
 ### Added
 - **Cost hat** (`board-cost`) — reviews what a project's own LLM/API calls cost

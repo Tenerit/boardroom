@@ -9,7 +9,7 @@
       "name": "boardroom",
       "source": "./",
       "description": "Whole-project review board: a panel of expert hats (architect, security, SRE, UX, product, investor, skeptic, cost) reviews a project in parallel and delivers a GO/NO-GO decision plus the cross-discipline trade-offs you must resolve.",
-      "version": "0.4.0",
+      "version": "0.5.0",
       "license": "MIT",
       "keywords": ["review", "decision", "due-diligence", "subagents", "go-no-go"]
     }

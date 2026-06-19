@@ -16,9 +16,15 @@ correct answer**, framed as decisions for a human. A code reviewer can pick the
 right answer; "ship now vs harden first" has no right answer, only an owner.
 
 Argument (optional): `$ARGUMENTS`
-May contain a target path, a hat selection, and/or `--debate`, e.g.
-`src/` · `--hats=security,sre` · `--debate` · `--hats=investor,pm marketing/`.
-If no path is given, review the current working directory.
+May contain a path, a depth mode, a hat selection, and/or `--debate`:
+- **`--light`** — 3 hats (architect, security, skeptic). Fast sanity pass for small repos.
+- **`--standard`** — 5 hats (+ SRE, product). Good default for a real project.
+- **`--deep`** — the full board, every applicable hat.
+- **`--hats=a,b`** — exact hats; overrides the depth mode.
+- **`--debate`** — add a rebuttal round on the conflicts.
+- a path (e.g. `src/`) scopes the review; default = current working directory.
+
+If neither a mode nor `--hats=` is given, fall back to smart assembly (step 2).
 
 ## The board
 
@@ -50,8 +56,10 @@ per hat via its `model:` frontmatter.
      entrypoints, routes/handlers, data layer, config, core domain logic. This is
      the navigation index that lets each hat jump straight to its lane.
 
-2. **Assemble the right board (you).** Don't run all seven blindly — match the
-   panel to the project type. If `--hats=` is given, honor it exactly. Otherwise:
+2. **Assemble the right board (you).** Honor an explicit selection first — `--hats=`
+   (exact), else a depth mode (`--light`/`--standard`/`--deep`, dropping any hat
+   irrelevant to the project, e.g. no investor on a throwaway script). Otherwise
+   match the panel to the project type:
 
    | Project type | Seat these hats | Skip / optional |
    | --- | --- | --- |
@@ -125,6 +133,17 @@ be willing to say "don't ship" and say exactly why.>
 
 ## Hard questions for the team
 - <each hat's sharpest unanswered question, deduped>
+
+## Summary (machine-readable — for tracking across projects)
+```yaml
+decision: SHIP | SHIP_WITH_FIXES | NOT_YET | NEEDS_PROOF
+risk_score: <0-100, higher = riskier to ship>
+hats: <count seated>
+top_3_blockers:
+  - <one line>
+  - <one line>
+  - <one line>
+```
 ```
 
 ## Rules
