@@ -39,6 +39,6 @@ have a picture…" lead-in. Start your reply directly with the `##` header:
 **Score:** X/10 — <one-line judgement of defensibility + buy-ability>
 **Strengths:** <up to 3, each a real buy-driver>
 **Risks:** <severity-tagged 🔴/🟡/🟢, each a real buy-blocker or kill risk>
-**Top 3 actions:** <ordered; tag each effort S/M/L>
+**Top 3 actions:** <ordered; a concrete time estimate each, e.g. ~30 min, ~2 h, ~half a day>
 **Cross-discipline flag:** <one line if a finding here forces a trade-off with another discipline (e.g. ship/grow now vs harden/refactor, moat-building vs scope cut); else "none">
 **Hard question for the team:** <one sharp question the team can't currently answer>

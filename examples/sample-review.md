@@ -1,65 +1,72 @@
 # Example: `/boardroom:review` on a SaaS billing API
 
-This is an illustrative run on a fictional project (`acme-billing`) to show the
-shape of the output. Your real reports cite your actual `file:line`s.
+An illustrative run on a fictional project (`acme-billing`) to show the shape of a
+full-board report. Your real reports cite your actual `file:line`s. For a *real*
+run on a real repo, see [`real-review-boardroom-v0.6.md`](real-review-boardroom-v0.6.md).
+
+> **Command:** `/boardroom:review` (full board — web-app / SaaS) · **8 hats**
 
 ---
 
-# Boardroom review — acme-billing
+`acme-billing` · boardroom · 8 hats
 
-## Decision: NOT YET
-The core billing logic is solid, but a money-touching race condition and an
-unauthenticated webhook make this unsafe to put in front of paying customers.
-**Two fixes gate the launch** — neither is large. Ship after they land.
+# 🚨 NOT YET — **5.5/10**
 
-## Decisions for you  (trade-offs — no single right answer; you choose)
-- **Hit the announced EU launch date vs add idempotency keys first.** *Product*
-  wants the date already promised to customers; *SRE + Security* show the charge
-  retry path can double-bill on a timeout.
-  → **What resolves it:** can you slip one week, or gate EU behind a flag until
-  idempotency lands?
-- **Stripe-only vs a pluggable payment abstraction now.** *Architect* wants the
-  abstraction before it's load-bearing; *Investor* calls it premature — one
-  customer, one processor.
-  → **What resolves it:** does any signed customer actually require a second
-  processor within 6 months?
+> The core billing logic is solid, but a money-touching race condition and an
+> unauthenticated webhook make this unsafe for paying customers. **Two fixes gate
+> the launch** — neither is large. Ship after they land.
 
 ## Scorecard
-| Hat | Score | One-line verdict |
-| --- | ----- | ---------------- |
-| Security | 4/10 | unauth webhook + a secret in the repo |
-| SRE | 5/10 | charge retry can double-bill |
-| Skeptic | 5/10 | "PCI-ready" claim is unproven |
-| Cost | 6/10 | dunning-email LLM calls uncached |
-| Investor | 6/10 | real pain, thin moat |
-| Architect | 7/10 | clean; slight over-abstraction |
-| Product | 7/10 | sharp ICP, tight scope |
-| UX | 7/10 | solid dashboard, rough error states |
+|  | Hat | Score | Verdict |
+|:--:|---|:--:|---|
+| 👍 | 🏛 Architect | **7/10** | clean module boundaries; slight over-abstraction |
+| 👍 | 📦 Product | **7/10** | sharp ICP, tight scope |
+| 👍 | 🎨 UX | **7/10** | solid dashboard, rough error states |
+| 👍 | 💰 Investor | **6/10** | real pain, thin moat |
+| 👍 | 🧮 Cost | **6/10** | dunning-email LLM calls uncached |
+| ⚠️ | 🛠 SRE | **5/10** | charge retry can double-bill |
+| ⚠️ | 🕵 Skeptic | **5/10** | "PCI-ready" claim is unproven |
+| ⚠️ | 🔒 Security | **4/10** | unauth webhook + a secret in the repo |
 
-## Consensus  (flagged by 2+ hats — do first)
-- **Stripe webhook signature never verified** (security, SRE) — `src/webhooks/stripe.ts:34`
-- **No idempotency on charge retries** (SRE, skeptic) — `src/billing/charge.ts:88`
+→ **Overall ~5.5/10**
 
-## Top risks  (ranked)
-1. 🔴 Unauthenticated webhook → forged payment events accepted (`src/webhooks/stripe.ts:34`)
-2. 🔴 Charge retry double-bills on upstream timeout (`src/billing/charge.ts:88`)
-3. 🟡 Live `STRIPE_SECRET` committed in `config/secrets.ts:5`
-4. 🟡 Dunning emails call the LLM per send, no cache (`src/email/dunning.ts:40`)
+> 👉 **Start with:** verify the Stripe webhook signature (`src/webhooks/stripe.ts:34`) — ~1 h.
 
-## Prioritized actions
-| # | Action | Effort | Impact | Raised by |
-| - | ------ | ------ | ------ | --------- |
-| 1 | Verify the Stripe webhook signature | S | high | security/SRE |
-| 2 | Idempotency key on every charge | M | high | SRE |
-| 3 | Rotate + remove the committed secret | S | high | security |
-| 4 | Cache dunning LLM calls on (customer, reason) fingerprint | S | med | cost |
+## ✅ What's solid
+- **Tight ICP and scope** — the product knows exactly who it's for; no feature sprawl.
+- **Clean module boundaries** — billing, webhooks, and email are well separated.
+- **Production-grade billing plumbing** — trial expiry and downgrade-on-failure are handled.
 
-## Hard questions for the team
-- What's the blast radius if the webhook secret leaks today?
-- Has anyone load-tested the retry path against Stripe's idempotency guarantees?
-- "PCI-ready" appears in the README — what control evidence backs that claim?
+## 🔧 What to fix · 4
+| Issue | Sev | Where | What to change | Time |
+|---|:--:|---|---|---|
+| Unauthenticated webhook → forged payment events accepted | 🔴 | `src/webhooks/stripe.ts:34` | verify the Stripe signature | ~1 h |
+| Charge retry double-bills on an upstream timeout | 🔴 | `src/billing/charge.ts:88` | idempotency key per charge | ~half a day |
+| Live `STRIPE_SECRET` committed to the repo | 🔴 | `config/secrets.ts:5` | rotate + move to env | ~30 min |
+| Dunning emails call the LLM per send, no cache | 🟡 | `src/email/dunning.ts:40` | cache on (customer, reason) | ~2 h |
+
+*Severity: 🔴 blocks shipping · 🟡 fix soon · 🟢 nice-to-have.*
+
+## ⚖️ Decisions for you · 2
+- **Hit the EU launch date vs add idempotency first.** Product wants the announced
+  date; SRE + Security show the retry path can double-bill. → **resolves:** slip one
+  week, or gate EU behind a flag until idempotency lands?
+- **Stripe-only vs a pluggable payment abstraction now.** Architect wants the
+  abstraction; Investor calls it premature (one customer, one processor). →
+  **resolves:** does any signed customer need a second processor within 6 months?
+
+## 📊 Summary (machine-readable)
+```yaml
+decision: NOT_YET
+risk_score: 70   # money-touching + an open security hole
+hats: 8
+top_3_blockers:
+  - unauthenticated stripe webhook (forged payment events)
+  - charge retry double-bills on timeout
+  - live secret committed to the repo
+```
 
 ---
 
-*Run with `--debate` to add a rebuttal round where the hats defend or concede on
-the two trade-offs above before the chair decides.*
+*Run with `--debate` to add a rebuttal round on the two trade-offs above before the
+chair decides.*

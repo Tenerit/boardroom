@@ -24,6 +24,11 @@ this project uses [semantic versioning](https://semver.org).
   per row** (`~30 min`, `~2 h`, `~half a day`) — no S/M/L abbreviation to decode.
 ### Fixed
 - README version badge (was stale at 0.4.0).
+- All 8 hats now ask for a concrete time estimate (matching the report format)
+  instead of the old `S/M/L` effort tag — no more two incompatible calibrations.
+- `examples/sample-review.md` re-rendered in the current report format (scorecard
+  with level emoji, "What's solid", "What to fix" table) — the showcase matched the
+  old v0.4 layout.
 
 ## [0.5.0] — 2026-06-19
 ### Added

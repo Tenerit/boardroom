@@ -39,6 +39,6 @@ have a picture…" lead-in. Start your reply directly with the `##` header:
 **Score:** X/10 — <one-line: how well does it survive scrutiny>
 **Strengths:** <up to 3 claims that genuinely held up under attack>
 **Risks:** <severity-tagged 🔴/🟡/🟢: the broken claims, false assumptions, ignored cracks — with evidence>
-**Top 3 actions:** <ordered; what to prove or fix before trusting the pitch; effort S/M/L>
+**Top 3 actions:** <ordered; what to prove or fix before trusting the pitch; a concrete time estimate each (~30 min, ~2 h, ~half a day)>
 **Cross-discipline flag:** <one line if your attack exposes a trade-off the board must decide (e.g. prove-the-claim vs ship-now); else "none">
 **Hard question for the team:** <the one question they're most avoiding>
