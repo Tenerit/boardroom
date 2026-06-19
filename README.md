@@ -1,115 +1,133 @@
-# boardroom — a whole-project review board for Claude Code
+# 🪑 boardroom
 
-Most reviews tell you whether the code is good. **boardroom tells you whether the
-*project* is good** — and gives you a decision.
+**Your project, reviewed by a board of experts — and handed a decision.**
 
-`/boardroom:review` convenes a board of expert hats — architect, security, SRE,
-UX, product, investor, and a skeptic — sends each into your project **in parallel**
-through its own lens, then delivers:
+`boardroom` is a Claude Code plugin. Run `/boardroom:review` and a panel of expert
+hats — architect, security, SRE, UX, product, investor, skeptic, cost — each study
+your project **in parallel** through their own lens. The chair then hands you a
+**GO/NO-GO decision** and, more importantly, the **trade-offs you have to decide**
+yourself.
 
-- a **GO / NO-GO decision** (SHIP · SHIP WITH FIXES · NOT YET · NEEDS PROOF), and
-- the **cross-discipline trade-offs you have to resolve** — the calls with no
-  correct answer (ship now vs harden first, scope vs simplicity, growth vs
-  compliance).
+It answers *"should we ship / buy / invest in / trust this?"* — not *"is this PR
+mergeable?"*
+
+---
+
+## See it in 10 seconds
 
 ```
+# Boardroom review — acme-billing
+
+## Decision: NOT YET
+Core billing logic is solid, but a money-touching race condition and an
+unauthenticated webhook make this unsafe for paying customers. Two fixes gate it.
+
+## Decisions for you  (no single right answer — you choose)
+- Hit the announced EU launch date vs add idempotency first.
+  Product wants the date; SRE+Security show the retry path can double-bill.
+  → What resolves it: slip one week, or gate EU behind a flag until it lands?
+...
+```
+
+👉 **[Read a full sample report →](examples/sample-review.md)**
+
+---
+
+## Quickstart
+
+```bash
+# 1. load it
+claude --plugin-dir ./boardroom
+
+# 2. review the current project
 /boardroom:review
-/boardroom:review src/
-/boardroom:review --hats=security,sre
-/boardroom:review --debate          # add a rebuttal round on the conflicts
 ```
 
-## How this is different
+Or install from the marketplace:
 
-There are already good multi-agent reviewers for Claude Code. boardroom sits where
-they don't:
+```
+/plugin marketplace add Tenerit/boardroom
+/plugin install boardroom@tenerit
+```
 
-| | Code-review panels (e.g. roundtable, official code-review) | Multi-**model** councils (Gemini/GPT/Grok) | **boardroom** |
+Then: `/boardroom:review` · `/boardroom:review src/` · `/boardroom:review --hats=security,sre` · `/boardroom:review --debate`
+
+---
+
+## Why boardroom (vs other review tools)
+
+| | Code-review panels | Multi-**model** councils | **boardroom** |
 | --- | --- | --- | --- |
-| Reviews | a diff / code quality | a question, across vendors | the **whole project** |
-| Hats | engineering only | one per model | **engineering + business** (investor, product, UX) |
-| Output | findings / a merge verdict | side-by-side answers | a **GO/NO-GO decision** |
-| Disagreement | a judge picks the right answer | consensus vs divergence | **surfaced as a decision *you* make** — because business trade-offs have no right answer |
+| Reviews | a diff | a question, across vendors | **the whole project** |
+| Hats | engineering only | one per model | **engineering + business** |
+| Output | findings / merge verdict | side-by-side answers | a **GO/NO-GO decision** |
+| Disagreement | a judge picks a winner | consensus vs divergence | **surfaced as a decision *you* make** |
 
-A code reviewer can adjudicate "is this correct?" The board's job is the question
-no judge can settle: *"is this worth shipping / buying / trusting — and what do we
-trade off to get there?"*
+A code reviewer can settle "is this correct?". The board's job is the question with
+no correct answer: *"is it worth shipping — and what do we trade off to get there?"*
 
-## What you get
-
-```
-# Boardroom review — <project>
-
-## Decision: SHIP WITH FIXES         ← the headline call + what's gating it
-## Decisions for you                 ← cross-discipline trade-offs you must resolve
-## Scorecard                         ← each hat's score + one-liner
-## Consensus                         ← flagged by 2+ hats — do first
-## Top risks                         ← ranked
-## Prioritized actions               ← effort × impact
-## Hard questions                    ← what the team can't currently answer
-```
+---
 
 ## The board
 
-| Hat | Lens |
+| Hat | Looks at |
 | --- | --- |
-| **Architect** | system design, coupling, complexity, tech debt |
-| **Security** | threat model, authz, secrets, injection, SSRF, supply chain |
-| **SRE** | reliability, failure modes, observability, deploy/rollback |
-| **UX** | first-run friction, clarity, hierarchy, consistency |
-| **Product** | who it's for, problem fit, scope, positioning |
-| **Investor** | moat, market, traction, kill-risks |
-| **Skeptic** | red-teams the headline claim and the load-bearing assumptions |
-| **Cost** | LLM/token spend — caching, prompt bounding, signal pre-extraction (auto-seated only when the project calls an LLM) |
+| 🏛️ **Architect** | system design, coupling, complexity, tech debt |
+| 🔒 **Security** | authz, secrets, injection, SSRF, supply chain |
+| 🛠️ **SRE** | reliability, failure modes, observability, deploy/rollback |
+| 🎯 **UX** | first-run friction, clarity, hierarchy, consistency |
+| 📦 **Product** | who it's for, problem fit, scope, positioning |
+| 💰 **Investor** | moat, market, traction, kill-risks |
+| 🕵️ **Skeptic** | red-teams the headline claim and the load-bearing assumptions |
+| 🧮 **Cost** | what your LLM/API calls actually cost (seated only if you call one) |
 
-Every hat is **read-only** — the board diagnoses, it never edits your code. The
-**Cost** hat is unique to boardroom — no other review panel judges what your LLM
-calls actually cost.
+Every hat is **read-only** — the board diagnoses, it never touches your code. The
+**Cost** hat is unique to boardroom; no other panel judges your token bill.
 
-## Install
+---
 
-```bash
-claude --plugin-dir ./boardroom    # then, in the session:
-/boardroom:review
-```
+## How it works
 
-## Smart panel assembly
+The `/boardroom:review` skill acts as the **chair**:
 
-The chair classifies the project and seats only the hats that fit — a throwaway
-script gets architect + skeptic; a SaaS product gets the full board; a library
-skips the investor unless you ask. Force a panel with `--hats=architect,security`.
+1. **Recon once** → builds a shared project map (so seven hats don't each re-read the repo).
+2. **Assembles the right board** → matches hats to the project type (a script gets 2 hats; a SaaS gets all of them).
+3. **Convenes in parallel** → each hat reviews its lane in its own context window.
+4. **Decides** → reconciles the verdicts into the decision + trade-offs report.
 
-## The `--debate` round
+Add `--debate` for a rebuttal round: hats see the *conflicts* and get to defend,
+concede, or refine before the chair rules — scoped to the disagreements, so it stays cheap.
 
-By default each hat reviews independently (one parallel pass). Add `--debate` for
-one extra **rebuttal round**: each hat sees only the *conflicting* findings and
-gets ≤3 lines to defend, concede, or refine. It sharpens the trade-offs without
-re-reviewing the whole project — cheap, scoped to the disagreements.
+---
 
-## Cost & performance
+## Built to be cheap
 
-Multi-agent reviews are token-hungry; boardroom spends the minimum:
+Multi-agent reviews burn tokens; boardroom minimizes it:
 
-- **Recon once, not N times.** The chair builds the project map a single time and
-  hands it to every hat, so seven reviewers don't each re-read the README and
-  re-walk the tree.
-- **Read budget.** Each hat navigates by the map, opens only its lane (aim ≤12
-  files), and cites instead of pasting whole files.
-- **Model tiering.** Deep-code hats `inherit` your session model; judgment hats
-  (UX, product, investor) default to a lighter model. Override any hat's `model:`.
-- **Right-sized panel + subsets.** Smart assembly and `--hats=` keep focused runs
-  cheap.
+- **Recon once, not N times** — one shared map, passed to every hat.
+- **Read budget** — each hat opens only its lane (~≤12 files) and cites instead of pasting.
+- **Model tiering** — deep-code hats use your session model; judgment hats default to a lighter one.
+- **Right-sized panel** — smart assembly + `--hats=` keep focused runs small.
 
-## Customize the board
+---
 
-Hats are just markdown subagents in `agents/`. Add one (copy an existing
-`board-*.md`, change the lens + verdict header, add it to the table in
-`skills/review/SKILL.md`). Worth adding: `board-cost` (token/$$ — pairs with a
-cost analyzer), `board-legal`, `board-data` (privacy/compliance), `board-perf`.
-Each hat returns the same verdict contract (score · strengths · severity-tagged
-risks · top-3 actions · cross-discipline flag · one hard question), which is what
-makes the decision synthesis clean.
+## Add your own hat
+
+Hats are just markdown subagents in [`agents/`](agents/). Copy one, change the lens
+and the verdict header, add a row to the table in
+[`skills/review/SKILL.md`](skills/review/SKILL.md). Each hat returns the same verdict
+contract (score · strengths · severity-tagged risks · top-3 actions · cross-discipline
+flag · one hard question) — that uniformity is what makes the chair's synthesis clean.
+
+Good additions: `board-legal`, `board-data` (privacy/compliance), `board-perf`.
+
+---
+
+## Privacy
+
+boardroom runs entirely inside your Claude Code session against your local files. It
+adds no network calls of its own and the hats never write to your project.
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).
