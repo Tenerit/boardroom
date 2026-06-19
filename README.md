@@ -2,6 +2,12 @@
 
 **Your project, reviewed by a board of experts — and handed a decision.**
 
+[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-8A2BE2)](https://docs.claude.com/en/docs/claude-code/plugins)
+[![version](https://img.shields.io/badge/version-0.4.0-green)](CHANGELOG.md)
+[![access: read-only](https://img.shields.io/badge/access-read--only-success)](#privacy)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 `boardroom` is a Claude Code plugin. Run `/boardroom:review` and a panel of expert
 hats — architect, security, SRE, UX, product, investor, skeptic, cost — each study
 your project **in parallel** through their own lens. The chair then hands you a
