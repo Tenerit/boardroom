@@ -19,6 +19,8 @@ yourself.
 It answers *"should we ship / buy / invest in / trust this?"* — not *"is this PR
 mergeable?"*
 
+> ⚖️ **boardroom doesn't converge to "truth" — it exposes _structured disagreement_ for a human to arbitrate.** The decision (and confidence) are signals for *you* to weigh, not an oracle's verdict.
+
 ---
 
 ## Who it's for
