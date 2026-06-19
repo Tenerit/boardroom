@@ -14,6 +14,11 @@ this project uses [semantic versioning](https://semver.org).
   of boardroom on itself, with real `file:line`s, metadata (command, hats, run
   time, token cost), and the verdict. Proof, not just a fictional sample.
 - **"Who it's for"** section in the README (named ICPs / jobs-to-be-done).
+### Changed
+- Cleaner, more scannable report format: scores on one line, a single ranked
+  "What to fix" table (severity + effort, consensus tagged) replacing the separate
+  scorecard/consensus/risks/actions sections, and an explicit Effort legend
+  (S < 1h · M ~½ day · L ≥ 1 day).
 ### Fixed
 - README version badge (was stale at 0.4.0).
 

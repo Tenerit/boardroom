@@ -110,32 +110,23 @@ per hat via its `model:` frontmatter.
 # Boardroom review — <project>
 
 ## Decision: <SHIP · SHIP WITH FIXES · NOT YET · NEEDS PROOF>
-<2–3 sentences: the call, and the 1–3 things gating it. This is the headline —
-be willing to say "don't ship" and say exactly why.>
+<2–3 sentences: the call + the 1–3 things gating it. Be willing to say "don't ship".>
 
-## Decisions for you  (cross-discipline trade-offs — no single right answer; you choose)
-- **<tension>**: <hat A> argues X because …; <hat B> argues Y because …
-  → **What resolves it:** <the info, test, or call that settles it>
-<this section is the point of the board; if there are no real tensions, say so>
+**Scores** — <Hat N/10 · Hat N/10 · … on one line>
 
-## Scorecard
-| Hat | Score | One-line verdict |
-| --- | ----- | ---------------- |
-<one row per seated hat>
+## What to fix  (ranked; merges risks + actions, mark consensus items)
+| Issue | Sev | Where | Fix | Effort |
+| ----- | :-: | ----- | --- | :----: |
+| <issue — note "(2+ hats)" if consensus> | 🔴 | `file:line` | <fix> | S |
 
-## Consensus  (flagged by 2+ hats — least controversial fixes, do first)
-- **<issue>** — who raised it, why it matters, `file:line`
+> **Effort** — S: < 1 h · M: ~½ day · L: ≥ 1 day
 
-## Top risks  (ranked, most dangerous first)
-1. <risk> — likelihood/impact, owner hat
+## Decisions for you  (trade-offs — no single right answer; you arbitrate)
+- **<tension>** — <hat A> wants X; <hat B> wants Y. → **resolves:** <info / test / call>
+<if a hat is confidently wrong, say so here and arbitrate — don't propagate it>
 
-## Prioritized actions
-| # | Action | Effort | Impact | Raised by |
-| - | ------ | ------ | ------ | --------- |
-| 1 | … | S/M/L | high/med/low | … |
-
-## Hard questions for the team
-- <each hat's sharpest unanswered question, deduped>
+## Hard questions
+- <the 1–2 sharpest unanswered questions, deduped>
 
 ## Summary (machine-readable — for tracking across projects)
 ```yaml
