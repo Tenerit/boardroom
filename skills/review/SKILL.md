@@ -112,7 +112,15 @@ per hat via its `model:` frontmatter.
 ## Decision: <SHIP · SHIP WITH FIXES · NOT YET · NEEDS PROOF>
 <2–3 sentences: the call + the 1–3 things gating it. Be willing to say "don't ship".>
 
-**Scores** — <Hat N/10 · Hat N/10 · … on one line>
+## Scores
+<one line per seated hat: emoji + name + a 10-cell bar in `inline code`
+(█ = filled up to the score, ░ = the rest) + **N/10**. Then **Overall: ~X/10**.
+The bar makes the score readable at a glance, e.g. `████████░░` for 8/10.>
+
+## What's solid
+<2–4 genuine strengths, concrete (name the file/area), pulled from the hats'
+Strengths. A review that only lists problems is unbalanced and trusted less —
+always say what's actually good before what's broken.>
 
 ## What to fix  (ranked; merges risks + actions, mark consensus items)
 | Issue | Sev | Where | What to change | Time |
