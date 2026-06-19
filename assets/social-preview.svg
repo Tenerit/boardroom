@@ -1,0 +1,40 @@
+<svg width="1280" height="640" viewBox="0 0 1280 640" xmlns="http://www.w3.org/2000/svg" role="img">
+  <title>boardroom — a Claude Code plugin</title>
+  <desc>A board of expert hats reviews your whole project and hands you a GO/NO-GO decision.</desc>
+  <rect x="0" y="0" width="1280" height="640" fill="#0E1117"/>
+  <rect x="0" y="0" width="8" height="640" fill="#8B5CF6"/>
+  <g font-family="'Segoe UI', system-ui, -apple-system, Roboto, sans-serif">
+    <text x="80" y="112" font-size="22" font-weight="500" letter-spacing="3" fill="#8B5CF6">CLAUDE CODE PLUGIN</text>
+    <text x="76" y="196" font-size="88" font-weight="700" fill="#F8FAFC">boardroom</text>
+    <text x="80" y="252" font-size="30" fill="#94A3B8">A board of expert hats reviews your whole project —</text>
+    <text x="80" y="294" font-size="30" fill="#94A3B8">and hands you a GO / NO-GO decision.</text>
+
+    <g font-size="20" fill="#C9D1D9" text-anchor="middle">
+      <rect x="80" y="350" width="138" height="48" rx="24" fill="#161B22" stroke="#30363D"/>
+      <text x="149" y="381">Architect</text>
+      <rect x="226" y="350" width="138" height="48" rx="24" fill="#161B22" stroke="#30363D"/>
+      <text x="295" y="381">Security</text>
+      <rect x="372" y="350" width="138" height="48" rx="24" fill="#161B22" stroke="#30363D"/>
+      <text x="441" y="381">SRE</text>
+      <rect x="518" y="350" width="138" height="48" rx="24" fill="#161B22" stroke="#30363D"/>
+      <text x="587" y="381">UX</text>
+      <rect x="664" y="350" width="138" height="48" rx="24" fill="#161B22" stroke="#30363D"/>
+      <text x="733" y="381">Product</text>
+      <rect x="810" y="350" width="138" height="48" rx="24" fill="#161B22" stroke="#30363D"/>
+      <text x="879" y="381">Investor</text>
+      <rect x="956" y="350" width="138" height="48" rx="24" fill="#161B22" stroke="#30363D"/>
+      <text x="1025" y="381">Skeptic</text>
+      <rect x="1102" y="350" width="138" height="48" rx="24" fill="#161B22" stroke="#30363D"/>
+      <text x="1171" y="381">Cost</text>
+    </g>
+
+    <rect x="80" y="448" width="1120" height="112" rx="16" fill="#11161D" stroke="#233044"/>
+    <circle cx="124" cy="504" r="9" fill="#34D399"/>
+    <text x="150" y="496" font-size="30" font-weight="600" fill="#E5E7EB">Decision: SHIP WITH FIXES</text>
+    <text x="150" y="532" font-size="20" fill="#8B96A5">plus the cross-discipline trade-offs only you can decide</text>
+    <text x="1168" y="514" font-size="26" font-family="'Cascadia Code', Consolas, monospace" fill="#8B5CF6" text-anchor="end">/boardroom:review</text>
+
+    <text x="80" y="602" font-size="20" fill="#5B6675">github.com/Tenerit/boardroom</text>
+    <text x="1200" y="602" font-size="20" fill="#5B6675" text-anchor="end">MIT · read-only · 8 hats</text>
+  </g>
+</svg>
