@@ -3,6 +3,14 @@
 All notable changes to boardroom. Format follows [Keep a Changelog](https://keepachangelog.com);
 this project uses [semantic versioning](https://semver.org).
 
+## [0.6.0] — 2026-06-19
+### Added
+- **Incremental review** — `--diff <range>` (e.g. `HEAD~10..HEAD`) and `--pr <n>`
+  scope the board to changed files only; the Decision becomes "safe to merge?".
+  The chair runs git/gh; hats stay read-only.
+- **Hat weighting** — `--weights security=3,sre=2,…` tilts the synthesis to a
+  project's real priorities (a bank ≠ a B2C SaaS).
+
 ## [0.5.0] — 2026-06-19
 ### Added
 - **Depth modes** — `--light` (3 hats), `--standard` (5), `--deep` (full board),

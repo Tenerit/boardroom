@@ -22,6 +22,9 @@ May contain a path, a depth mode, a hat selection, and/or `--debate`:
 - **`--deep`** — the full board, every applicable hat.
 - **`--hats=a,b`** — exact hats; overrides the depth mode.
 - **`--debate`** — add a rebuttal round on the conflicts.
+- **`--diff <range>`** — review only what changed (e.g. `--diff HEAD~10..HEAD`). Incremental / pre-merge review.
+- **`--pr <number>`** — review a GitHub pull request's diff (the chair fetches it with `gh`).
+- **`--weights hat=N,…`** — weight hats in the final synthesis (e.g. `--weights security=3,sre=2`); higher = more pull on the decision and `risk_score`. Default = 1 each.
 - a path (e.g. `src/`) scopes the review; default = current working directory.
 
 If neither a mode nor `--hats=` is given, fall back to smart assembly (step 2).
@@ -154,6 +157,15 @@ top_3_blockers:
   present both sides' strongest case and what would settle it. Do not pick a
   winner on questions that have no correct answer — that's the human's call.
 - **Analysis only.** The board never edits, creates, or deletes project files.
+- **Incremental scope (`--diff` / `--pr`).** When set, the chair first lists the
+  changed files (`git diff --name-only <range>`, or `gh pr diff <n> --name-only`)
+  and builds the project map from *those* files plus their direct dependents. Every
+  hat reviews only the change, and the Decision answers *"is this change safe to
+  merge?"* — not the whole project. Hats stay read-only; only the chair runs git/gh.
+- **Weights (`--weights`).** Apply the multipliers when reconciling — a weighted
+  hat's risks pull harder on the Decision and `risk_score`. State the weighting in
+  the report so the verdict stays interpretable (a bank weights security/SRE; a
+  B2C SaaS weights UX/product).
 - **Be concrete.** "Improve error handling" is useless; "`api/index.ts:88`
   swallows the DB error and returns 200" is a finding. Hold the hats to it.
 - **Spend tokens once.** Build the project map before convening and pass it to
