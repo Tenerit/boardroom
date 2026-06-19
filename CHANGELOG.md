@@ -10,6 +10,12 @@ this project uses [semantic versioning](https://semver.org).
   The chair runs git/gh; hats stay read-only.
 - **Hat weighting** — `--weights security=3,sre=2,…` tilts the synthesis to a
   project's real priorities (a bank ≠ a B2C SaaS).
+- **First real review** — `examples/real-review-boardroom-v0.6.md`: an actual run
+  of boardroom on itself, with real `file:line`s, metadata (command, hats, run
+  time, token cost), and the verdict. Proof, not just a fictional sample.
+- **"Who it's for"** section in the README (named ICPs / jobs-to-be-done).
+### Fixed
+- README version badge (was stale at 0.4.0).
 
 ## [0.5.0] — 2026-06-19
 ### Added

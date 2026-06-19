@@ -3,7 +3,7 @@
 **Your project, reviewed by a board of experts — and handed a decision.**
 
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-8A2BE2)](https://docs.claude.com/en/docs/claude-code/plugins)
-[![version](https://img.shields.io/badge/version-0.4.0-green)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.6.0-green)](CHANGELOG.md)
 [![access: read-only](https://img.shields.io/badge/access-read--only-success)](#privacy)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -18,6 +18,23 @@ yourself.
 
 It answers *"should we ship / buy / invest in / trust this?"* — not *"is this PR
 mergeable?"*
+
+---
+
+## Who it's for
+
+You'll get value if you're one of these — and the page below should make you think
+*"this is for me"* in 10 seconds:
+
+- **The solo dev / OSS maintainer** auditing their own project before a release or
+  a launch — *"I built this alone; what would a team of experts flag?"*
+- **The CTO / tech lead doing fast due diligence** on a repo before adopting,
+  buying, or integrating it — *"is this worth betting on, and where's the risk?"*
+- **The plugin/tool author** who wants a second opinion that spans business *and*
+  engineering, not just code style.
+
+If you only need line-by-line code review of a diff, a code-review tool is a better
+fit — boardroom is for **whole-project, ship/no-ship judgment**.
 
 ---
 
@@ -37,7 +54,7 @@ unauthenticated webhook make this unsafe for paying customers. Two fixes gate it
 ...
 ```
 
-👉 **[Read a full sample report →](examples/sample-review.md)**
+👉 **[Read a full sample report →](examples/sample-review.md)** · or a **[real run of boardroom reviewing itself →](examples/real-review-boardroom-v0.6.md)**
 
 ---
 
