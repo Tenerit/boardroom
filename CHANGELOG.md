@@ -16,9 +16,9 @@ this project uses [semantic versioning](https://semver.org).
 - **"Who it's for"** section in the README (named ICPs / jobs-to-be-done).
 ### Changed
 - Cleaner, more scannable report format: scores on one line, a single ranked
-  "What to fix" table (severity + effort, consensus tagged) replacing the separate
-  scorecard/consensus/risks/actions sections, and an explicit Effort legend
-  (S < 1h · M ~½ day · L ≥ 1 day).
+  "What to fix" table (severity + "what to change" + time) replacing the separate
+  scorecard/consensus/risks/actions sections. Effort is a **concrete time estimate
+  per row** (`~30 min`, `~2 h`, `~half a day`) — no S/M/L abbreviation to decode.
 ### Fixed
 - README version badge (was stale at 0.4.0).
 

@@ -115,11 +115,12 @@ per hat via its `model:` frontmatter.
 **Scores** — <Hat N/10 · Hat N/10 · … on one line>
 
 ## What to fix  (ranked; merges risks + actions, mark consensus items)
-| Issue | Sev | Where | Fix | Effort |
-| ----- | :-: | ----- | --- | :----: |
-| <issue — note "(2+ hats)" if consensus> | 🔴 | `file:line` | <fix> | S |
+| Issue | Sev | Where | What to change | Time |
+| ----- | :-: | ----- | -------------- | ---- |
+| <issue — note "(2+ hats)" if consensus> | 🔴 | `file:line` | <the concrete change> | ~30 min |
 
-> **Effort** — S: < 1 h · M: ~½ day · L: ≥ 1 day
+Severity: 🔴 blocks shipping · 🟡 fix soon · 🟢 nice-to-have.
+Time = a real estimate per row (`~30 min`, `~2 h`, `~half a day`, `~1 day`) — never an abbreviation to decode.
 
 ## Decisions for you  (trade-offs — no single right answer; you arbitrate)
 - **<tension>** — <hat A> wants X; <hat B> wants Y. → **resolves:** <info / test / call>
