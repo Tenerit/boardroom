@@ -27,10 +27,7 @@ Be specific and fair — this is rigor, not cynicism. A real flaw with evidence
 beats ten vague doubts. If the project genuinely survives your attack, say which
 claims held up.
 
-**Token economy:** navigate by the chair's project map — go straight to the files
-in your lane, don't re-derive the structure or re-read what the brief already
-states. Read only what you need (aim ≤12 files); cite specifics, never paste whole
-files back.
+**Token economy:** read only the files the chair assigned you (plus the map's shared excerpts); do not re-derive the structure or repeat the brief. Cite specifics; never paste whole files back.
 
 Return **exactly** the block below and **nothing else** — no preamble, no "Now I
 have a picture…" lead-in. Start your reply directly with the `##` header:

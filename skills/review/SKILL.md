@@ -48,16 +48,21 @@ per hat via its `model:` frontmatter.
 
 ## Procedure
 
-1. **Recon → shared project map (you).** Do ONE recon pass so the hats don't each
-   re-walk the tree — that duplicated exploration is the biggest cost in a
-   multi-agent review. Skim the README, the manifest (`package.json` /
-   `pyproject.toml` / `Cargo.toml` / `go.mod`…), and the top-level structure, then
-   produce a compact **project map**:
-   - **Brief:** ≤120 words — what it is, the stack, the entrypoints. Factual.
+1. **Recon → shared project map (you).** Do ONE recon pass — the only full walk of
+   the repo; the hats must not repeat it. Skim the README, the manifest
+   (`package.json` / `pyproject.toml` / `Cargo.toml` / `go.mod`…), and the top-level
+   structure, then produce a compact **project map**. The map is sent to *every*
+   hat, so every line costs ×N — keep it tight:
+   - **Brief:** ≤100 words — what it is, the stack, the entrypoints. Factual.
    - **Project type:** classify it (see step 2) — drives who sits on the board.
-   - **Key files:** annotated list, `path — one phrase`, ~15–30 lines, covering
-     entrypoints, routes/handlers, data layer, config, core domain logic. This is
-     the navigation index that lets each hat jump straight to its lane.
+   - **Key files → assigned:** ≤20 lines, `path — one phrase — → hat(s)`. Annotate
+     each load-bearing file AND assign it to the 1–2 hats that most need it, so the
+     hats read **disjoint** sets instead of all opening the same core files (the #1
+     duplicated cost). A file everyone needs → all hats; most files → one lane.
+   - **Shared excerpts (optional):** for the 2–4 files *every* hat would otherwise
+     open (entrypoint, config, manifest), paste the key 5–15 lines *once* here so the
+     hats don't each re-read the whole file. Orientation only — a hat may still open
+     the file if a finding needs full context.
 
 2. **Assemble the right board (you).** Honor an explicit selection first — `--hats=`
    (exact), else a depth mode (`--light`/`--standard`/`--deep`, dropping any hat
@@ -83,16 +88,19 @@ per hat via its `model:` frontmatter.
 
 3. **Convene in parallel.** In a **single message**, call the `Agent` tool once
    per seated hat (`subagent_type` = the `board-*` name). Give each the **same**
-   prompt:
-   - the **brief + project map** from step 1,
+   prompt (with its own assigned file list):
+   - the **brief + project map** from step 1, and the hat's **assigned files**,
    - the target path,
-   - "Navigate via the map — open only files in your lane; don't re-derive the
-     structure. Examine through your lens, return your verdict in the required
-     format with no preamble, cite `file:line`. **If a finding here forces a
-     trade-off with another discipline, fill the Cross-discipline flag.** Analysis
-     only — never edit, create, or delete anything."
+   - "Read ONLY the files the map assigned to your hat, plus the shared excerpts
+     already in the map. Don't re-derive the structure or open another hat's lane.
+     **Hard cap: read at most N files** (N = 5 for `--light`, 8 for `--standard`,
+     12 for `--deep`/full) — if you'd need more, say so in your verdict instead of
+     reading on. Examine through your lens, return your verdict in the required
+     format with no preamble, cite `file:line`. Fill the Cross-discipline flag if a
+     finding forces a trade-off. Analysis only — never edit anything."
 
-   One round-trip, independent context per hat.
+   One round-trip, independent context per hat. Assigning disjoint file sets +
+   the per-mode cap is what keeps an N-hat review from re-reading the repo N times.
 
 4. **(Optional) Rebuttal round — only if `--debate`.** After collecting verdicts,
    gather every hat's **Cross-discipline flag** plus the conflicting risks. In one

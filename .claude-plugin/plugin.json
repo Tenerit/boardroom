@@ -1,7 +1,7 @@
 {
   "name": "boardroom",
   "description": "Convene a board of expert hats (architect, security, SRE, UX, product, investor, skeptic) over your whole project in parallel, then get a GO/NO-GO decision plus the cross-discipline trade-offs a human must resolve. Whole-project judgment — should you ship / buy / invest / trust this — not line-by-line code review.",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "author": {
     "name": "boardroom contributors"
   },

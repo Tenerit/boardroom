@@ -3,6 +3,18 @@
 All notable changes to boardroom. Format follows [Keep a Changelog](https://keepachangelog.com);
 this project uses [semantic versioning](https://semver.org).
 
+## [0.6.1] — 2026-06-19
+### Changed
+- **Token cost cut — output unchanged.** Reduced the parts of the bill that scale
+  with the number of hats (the reading), without touching the report or findings:
+  - the chair now **assigns disjoint file sets** to hats, so the panel doesn't all
+    open the same core files (the #1 duplicated cost);
+  - it pastes **shared excerpts** of the few universally-needed files into the map
+    once, instead of each hat re-reading the whole file;
+  - a **hard per-mode read cap** (5 / 8 / 12 files for `--light` / `--standard` /
+    `--deep`) replaces the soft "aim ≤12";
+  - per-hat prompt boilerplate compressed.
+
 ## [0.6.0] — 2026-06-19
 ### Added
 - **Incremental review** — `--diff <range>` (e.g. `HEAD~10..HEAD`) and `--pr <n>`

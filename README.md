@@ -3,7 +3,7 @@
 **Your project, reviewed by a board of experts — and handed a decision.**
 
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-8A2BE2)](https://docs.claude.com/en/docs/claude-code/plugins)
-[![version](https://img.shields.io/badge/version-0.6.0-green)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.6.1-green)](CHANGELOG.md)
 [![access: read-only](https://img.shields.io/badge/access-read--only-success)](#privacy)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -162,10 +162,17 @@ concede, or refine before the chair rules — scoped to the disagreements, so it
 
 Multi-agent reviews burn tokens; boardroom minimizes it:
 
-- **Recon once, not N times** — one shared map, passed to every hat.
-- **Read budget** — each hat opens only its lane (~≤12 files) and cites instead of pasting.
-- **Model tiering** — deep-code hats use your session model; judgment hats default to a lighter one.
+- **Recon once, not N times** — one shared map, built by the chair, passed to every hat.
+- **Disjoint reads** — the chair *assigns* each load-bearing file to the 1–2 hats that
+  need it, so the panel doesn't all open the same core files (the #1 duplicated cost).
+- **Shared excerpts** — the few files every hat needs are pasted into the map once,
+  instead of each hat re-reading the whole file.
+- **Hard read cap per mode** — 5 files/hat on `--light`, 8 on `--standard`, 12 on `--deep`.
+- **Model tiering** — deep-code hats use your session model; judgment hats a lighter one.
 - **Right-sized panel** — smart assembly + `--hats=` keep focused runs small.
+
+These cut the parts of the bill that scale with the number of hats (the reading), not
+the output — so the report and the findings are unchanged.
 
 ---
 
