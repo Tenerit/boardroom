@@ -77,7 +77,38 @@ Or install from the marketplace:
 /plugin install boardroom@tenerit
 ```
 
-Then: `/boardroom:review` · `/boardroom:review src/` · `/boardroom:review --hats=security,sre` · `/boardroom:review --debate`
+> **`/boardroom:review` → "Unknown command"?** Your environment has no plugin system
+> (e.g. an agent / cowork session — `/plugin` won't be available there either).
+> boardroom needs an interactive **Claude Code CLI or desktop**. After install,
+> run `/reload-plugins` or restart the session if the command isn't found yet.
+
+### Modes & flags
+
+| You want… | Run |
+| --- | --- |
+| A quick sanity pass (3 hats) | `/boardroom:review --light` |
+| A normal review (5 hats) | `/boardroom:review --standard` |
+| The full board | `/boardroom:review --deep` |
+| Specific hats only | `/boardroom:review --hats=security,sre` |
+| Scope to a folder | `/boardroom:review src/` |
+| A rebuttal round on the conflicts | add `--debate` |
+
+No flag? The chair auto-sizes the board to the project.
+
+### Review every PR ⭐
+
+The cheapest, most repeatable way to use boardroom — review only what *changed*,
+on every pull request, before merge:
+
+```
+/boardroom:review --pr 42            # a GitHub PR
+/boardroom:review --diff HEAD~1      # the last commit
+```
+
+The board scopes to the changed files (cheap — a diff is small), and the decision
+becomes **"is this change safe to merge?"** — a 2-minute multi-hat gate on every
+PR, not a one-off audit. This is the recurring workflow; the whole-project review
+is for milestones (a launch, an acquisition, a quarterly health check).
 
 ---
 

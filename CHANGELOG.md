@@ -22,6 +22,10 @@ this project uses [semantic versioning](https://semver.org).
   "What to fix" table (severity + "what to change" + time) replacing the separate
   scorecard/consensus/risks/actions sections. Effort is a **concrete time estimate
   per row** (`~30 min`, `~2 h`, `~half a day`) — no S/M/L abbreviation to decode.
+- README usage section reworked: a modes/flags table ("which mode when"), a
+  dedicated **"Review every PR"** section positioning `--pr`/`--diff` as the
+  recurring, cheap workflow (review the diff on every PR, not just one-off audits),
+  and a troubleshooting note for the "Unknown command" environment trap.
 ### Fixed
 - README version badge (was stale at 0.4.0).
 - All 8 hats now ask for a concrete time estimate (matching the report format)
