@@ -120,6 +120,11 @@ per hat via its `model:` frontmatter.
 ## Decision: <SHIP · SHIP WITH FIXES · NOT YET · NEEDS PROOF>
 <2–3 sentences: the call + the 1–3 things gating it. Be willing to say "don't ship".>
 
+**Flips to <the next-better decision> if:** <the single thing that would change the
+verdict — "prove X", "add monitoring", "land one paying user". This is the most
+actionable line in the report: a reader who gets NOT YET immediately wants to know
+"what do I do to get SHIP?" — answer it here. Omit only if the decision is already SHIP.>
+
 ## Scorecard
 |  | Hat | Score | One-line verdict |
 | :--: | --- | :---: | ---------------- |
@@ -145,14 +150,24 @@ Time = a real estimate per row (`~30 min`, `~2 h`, `~half a day`, `~1 day`) — 
 
 ## Decisions for you  (trade-offs — no single right answer; you arbitrate)
 - **<tension>** — <hat A> wants X; <hat B> wants Y. → **resolves:** <info / test / call>
+<Often a conflict is really an *assumption mismatch* — use the hats' Key assumptions
+and frame it as "Assumption A vs Assumption B" (e.g. "untrusted users have access"
+vs "internal-only tool"), not just "Security vs Product". That's the more useful
+conflict to surface.>
 <if a hat is confidently wrong, say so here and arbitrate — don't propagate it>
 
 ## Hard questions
 - <the 1–2 sharpest unanswered questions, deduped>
 
+## Strongest case the board is wrong  (red-team your own verdict)
+<2–3 lines: the best argument that *this decision is mistaken* — a falsification
+attempt, not a re-review. If it doesn't hold, the verdict stands stronger; if it
+stings, the reader knows the real risk in trusting it.>
+
 ## Summary (machine-readable — for tracking across projects)
 ```yaml
 decision: SHIP | SHIP_WITH_FIXES | NOT_YET | NEEDS_PROOF
+flips_if: <the one thing that would change the decision; null if already SHIP>
 risk_score: <0-100, higher = riskier to ship>
 hats: <count seated>
 top_3_blockers:

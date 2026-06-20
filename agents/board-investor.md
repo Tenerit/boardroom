@@ -37,5 +37,6 @@ have a picture…" lead-in. Start your reply directly with the `##` header:
 **Strengths:** <up to 3, each a real buy-driver>
 **Risks:** <severity-tagged 🔴/🟡/🟢, each a real buy-blocker or kill risk>
 **Top 3 actions:** <ordered; a concrete time estimate each, e.g. ~30 min, ~2 h, ~half a day>
+**Key assumption:** <the one assumption your top risk rests on — lets the chair trace a disagreement to mismatched assumptions, not just "hat vs hat">
 **Cross-discipline flag:** <one line if a finding here forces a trade-off with another discipline (e.g. ship/grow now vs harden/refactor, moat-building vs scope cut); else "none">
 **Hard question for the team:** <one sharp question the team can't currently answer>

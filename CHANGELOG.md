@@ -3,6 +3,21 @@
 All notable changes to boardroom. Format follows [Keep a Changelog](https://keepachangelog.com);
 this project uses [semantic versioning](https://semver.org).
 
+## [0.7.0] — 2026-06-19
+### Added — governance / decision-grade output (the moat, not new hats)
+- **"Flips to … if"** — every non-SHIP decision now states the single thing that
+  would change the verdict. A reader who gets NOT YET immediately wants "what do I
+  do to get SHIP?" — this answers it. The most actionable line in the report.
+- **Key assumption per hat** — each verdict states the assumption its top risk rests
+  on, so a conflict can be framed as *Assumption A vs Assumption B*, not just
+  "hat vs hat" — the more useful disagreement to surface.
+- **"Strongest case the board is wrong"** — a red-team / falsification of the board's
+  own verdict at the end of every report (not a re-review).
+- `flips_if` added to the machine-readable summary.
+
+Reliability/eval (stability runner, confidence, fixtures) remain the open v0.7
+milestone work; this release ships the governance layer.
+
 ## [0.6.1] — 2026-06-19
 ### Changed
 - **Token cost cut — output unchanged.** Reduced the parts of the bill that scale
