@@ -3,7 +3,7 @@
 **Your project, reviewed by a board of experts — and handed a decision.**
 
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-8A2BE2)](https://docs.claude.com/en/docs/claude-code/plugins)
-[![version](https://img.shields.io/badge/version-0.7.0-green)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.8.0-green)](CHANGELOG.md)
 [![access: read-only](https://img.shields.io/badge/access-read--only-success)](#privacy)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -45,9 +45,12 @@ fit — boardroom is for **whole-project, ship/no-ship judgment**.
 ```
 # Boardroom review — acme-billing
 
-## Decision: NOT YET
+## Decision: NOT YET · confidence: Medium
 Core billing logic is solid, but a money-touching race condition and an
 unauthenticated webhook make this unsafe for paying customers. Two fixes gate it.
+
+**Confidence: Medium** — both blockers verified against source (2/2); SRE and Security
+agree, but the security hat hit the read cap on the webhook layer.
 
 ## Decisions for you  (no single right answer — you choose)
 - Hit the announced EU launch date vs add idempotency first.
@@ -114,15 +117,22 @@ is for milestones (a launch, an acquisition, a quarterly health check).
 
 ## Why boardroom (vs other review tools)
 
-| | Code-review panels | Multi-**model** councils | **boardroom** |
+| | Code-review panels | Persona / debate panels | **boardroom** |
 | --- | --- | --- | --- |
-| Reviews | a diff | a question, across vendors | **the whole project** |
-| Hats | engineering only | one per model | **engineering + business** |
-| Output | findings / merge verdict | side-by-side answers | a **GO/NO-GO decision** |
-| Disagreement | a judge picks a winner | consensus vs divergence | **surfaced as a decision *you* make** |
+| Reviews | a diff | code & plans (engineering lens) | **the whole project — business + technical** |
+| Hats | engineering only | engineering personas | **engineering + business (investor/pm/ux) + a token-cost hat** |
+| On conflict | a judge picks a winner | a judge picks a winner | **handed to *you* to arbitrate — no forced winner** |
+| Output | findings / merge verdict | one verdict | a **GO/NO-GO decision + the trade-offs you own** |
+| Trust signal | — | claim verification | **load-bearing findings verified + a confidence & agreement flag** |
 
 A code reviewer can settle "is this correct?". The board's job is the question with
 no correct answer: *"is it worth shipping — and what do we trade off to get there?"*
+
+The strongest debate panels go deeper on verification machinery — and stay
+engineering-only, and *resolve* the disagreement into a single verdict. boardroom's
+job is the opposite: keep the no-right-answer trade-off **visible for the human to
+own**, now backed by enough verification and a confidence signal that you can trust
+the parts that *do* have a right answer.
 
 ---
 
@@ -140,7 +150,9 @@ no correct answer: *"is it worth shipping — and what do we trade off to get th
 | 🧮 **Cost** | what your LLM/API calls actually cost (seated only if you call one) |
 
 Every hat is **read-only** — the board diagnoses, it never touches your code. The
-**Cost** hat is unique to boardroom; no other panel judges your token bill.
+**Cost** hat is unusual: it judges what *your* project's LLM/API calls cost — caching,
+prompt bounding, signal pre-extraction — a lens that general "is this expensive?" takes
+miss (seated only when your project actually calls a model).
 
 ---
 
@@ -173,6 +185,29 @@ Multi-agent reviews burn tokens; boardroom minimizes it:
 
 These cut the parts of the bill that scale with the number of hats (the reading), not
 the output — so the report and the findings are unchanged.
+
+---
+
+## Built to be trusted
+
+Every hat is the same base model, so a confident-sounding finding can still be a
+hallucinated `file:line`, and unanimous agreement can be a shared blind spot rather
+than signal. boardroom guards the verdict:
+
+- **Findings are verified before they gate.** The chair spot-checks every 🔴
+  ship-blocking finding against its cited source; one that doesn't hold is marked
+  `⚠ unverified` and is not allowed to gate the decision.
+- **Every hat tags its risks** `[seen]` (confirmed at the line) vs `[inferred]`
+  (suspected) and reports its own **confidence** — so a guess never masquerades as fact.
+- **The decision carries a confidence** (High / Medium / Low) from hat agreement,
+  verification, and coverage. Low confidence reads as *"a prompt for human review, not
+  a verdict"*.
+- **Unanimity is flagged, not celebrated.** When the board fully agrees, the chair says
+  so and names the independent evidence (a real run, a paying user, a benchmark) that
+  would confirm it — consensus among same-model reviewers is a caution, not proof.
+
+> boardroom doesn't pretend to a certainty it lacks. It exposes *structured, verified
+> disagreement* with a confidence attached — for a human to arbitrate.
 
 ---
 

@@ -55,6 +55,11 @@ per hat via its `model:` frontmatter.
    hat, so every line costs ×N — keep it tight:
    - **Brief:** ≤100 words — what it is, the stack, the entrypoints. Factual.
    - **Project type:** classify it (see step 2) — drives who sits on the board.
+   - **Intent:** who it's for and the goal — *personal / hobby OSS* · *internal / team
+     tool* · *commercial product* · *venture-scale*. Type says what it *is*; intent
+     says whether the **business** hats have anything real to judge. Signals: pricing /
+     billing / a company / funding language → commercial; a single-author MIT tool with
+     no monetization → hobby OSS.
    - **Key files → assigned:** ≤20 lines, `path — one phrase — → hat(s)`. Annotate
      each load-bearing file AND assign it to the 1–2 hats that most need it, so the
      hats read **disjoint** sets instead of all opening the same core files (the #1
@@ -82,9 +87,18 @@ per hat via its `model:` frontmatter.
    project itself calls an LLM or a metered API (check the manifest for
    `openai`/`anthropic`/`ollama`/etc., or grep for a model call). Skip it otherwise.
 
-   State which hats you seated and why in one line. Only seat investor/pm/ux when
-   there is a real product/user to judge — running an investor hat on a utility
-   wastes tokens and produces noise.
+   State which hats you seated and why in one line. **Match the business hats to
+   intent (step 1), not just project type** — a project's type says what it is; its
+   intent says whether business hats have anything real to judge:
+   - **Investor** — seat only when there's a plausible funding / acquisition /
+     commercial thesis (monetization, a company, a stated business goal). **Skip it on
+     solo or hobby OSS and internal tools with no funding intent** — a moat / traction /
+     market critique of a project that isn't seeking money is noise, not signal. Honor
+     an explicit `--hats=investor` if the user forces it.
+   - **Product / UX** — seat when there are real users to serve (even a free OSS tool
+     has users); skip on throwaway or single-author scripts with no audience.
+   Running a business hat on a project with no business produces confident, useless
+   findings — the opposite of the point.
 
 3. **Convene in parallel.** In a **single message**, call the `Agent` tool once
    per seated hat (`subagent_type` = the `board-*` name). Give each the **same**
@@ -109,16 +123,41 @@ per hat via its `model:` frontmatter.
    sharpens the trade-offs cheaply (it's scoped to the conflicts, not the whole
    project). Skip entirely without `--debate`.
 
-5. **Decide & reconcile (you).** Synthesize into the report below. Lead with the
-   decision. Make the trade-offs the centerpiece — do not smooth them away.
+5. **Verify the load-bearing findings (you).** Every hat is the same base model — a
+   confidently-worded finding can still be a hallucinated `file:line`. Before you
+   decide, take the 🔴 ship-blocking findings and any finding the decision leans on,
+   and re-open the cited source to confirm it actually says what the hat claimed.
+   **Demote any finding whose citation doesn't hold** — drop it from the blockers and
+   mark it `⚠ unverified`; it must not gate the decision. This is scoped to the
+   decision-critical findings only — a handful of reads, not a re-review — so it stays
+   cheap. Track how many held (`blockers_verified: N/M`).
+
+6. **Decide & reconcile (you).** Synthesize into the report below. Lead with the
+   decision and a **confidence** (High / Medium / Low). Make the trade-offs the
+   centerpiece — do not smooth them away. Derive the confidence honestly:
+   - **Hat agreement** — do the hats point the same way, or split? A wide score spread,
+     or hats dissenting from the decision direction, lowers it.
+   - **Verification** — an unverified blocker, or a decision resting on a finding you
+     could not confirm in source, lowers it.
+   - **Coverage** — hats that hit the read cap and skipped a load-bearing file lower it.
+   - **⚠ Unanimity is a yellow flag, not a green one.** If every hat agrees, say so —
+     same-model reviewers can share a blind spot, so consensus can be correlated bias
+     rather than signal. Name the independent evidence (a real run, a paying user, a
+     benchmark) that would actually confirm it; never sell agreement as certainty.
 
 ## Report format
 
 ```
 # Boardroom review — <project>
 
-## Decision: <SHIP · SHIP WITH FIXES · NOT YET · NEEDS PROOF>
+## Decision: <SHIP · SHIP WITH FIXES · NOT YET · NEEDS PROOF> · confidence: <High · Medium · Low>
 <2–3 sentences: the call + the 1–3 things gating it. Be willing to say "don't ship".>
+
+**Confidence: <High · Medium · Low>** — <one line on *why* the board is this sure:
+hat agreement (aligned / split), verification (N/M blockers confirmed in source), and
+coverage (did hats hit the read cap?). If the board is unanimous, flag it here as a
+possible shared blind spot and name what would independently confirm it — don't sell
+agreement as certainty. Low confidence = "a prompt for human review, not a verdict".>
 
 **Flips to <the next-better decision> if:** <the single thing that would change the
 verdict — "prove X", "add monitoring", "land one paying user". This is the most
@@ -147,6 +186,9 @@ always say what's actually good before what's broken.>
 
 Severity: 🔴 blocks shipping · 🟡 fix soon · 🟢 nice-to-have.
 Time = a real estimate per row (`~30 min`, `~2 h`, `~half a day`, `~1 day`) — never an abbreviation to decode.
+Verification: the chair spot-checks every 🔴 against its cited source before it may
+gate the decision (step 5). A blocker whose citation didn't hold is marked `⚠ unverified`
+and does **not** count toward the decision — note it, don't gate on it.
 
 ## Decisions for you  (trade-offs — no single right answer; you arbitrate)
 - **<tension>** — <hat A> wants X; <hat B> wants Y. → **resolves:** <info / test / call>
@@ -167,8 +209,11 @@ stings, the reader knows the real risk in trusting it.>
 ## Summary (machine-readable — for tracking across projects)
 ```yaml
 decision: SHIP | SHIP_WITH_FIXES | NOT_YET | NEEDS_PROOF
+confidence: HIGH | MEDIUM | LOW
 flips_if: <the one thing that would change the decision; null if already SHIP>
 risk_score: <0-100, higher = riskier to ship>
+hat_agreement: unanimous | strong | split   # unanimous = also a shared-bias caution
+blockers_verified: <N/M — ship-blocking findings that held against source>
 hats: <count seated>
 top_3_blockers:
   - <one line>
@@ -184,6 +229,14 @@ top_3_blockers:
   genuinely disagree (ship vs harden, scope vs simplicity, growth vs compliance),
   present both sides' strongest case and what would settle it. Do not pick a
   winner on questions that have no correct answer — that's the human's call.
+- **Verify before you gate.** A finding only blocks shipping if its citation checks
+  out. All hats share one base model, so a `file:line` can be confidently hallucinated;
+  the chair confirms the load-bearing ones against source (step 5) and demotes the rest.
+  Never propagate an unverified blocker into the decision.
+- **Confidence, not certainty.** The decision carries a confidence from hat agreement,
+  verification, and coverage. Unanimous agreement is a *caution*, not a guarantee —
+  same-model reviewers can share a blind spot. Say what independent evidence would
+  confirm a consensus instead of treating the consensus as the evidence.
 - **Analysis only.** The board never edits, creates, or deletes project files.
 - **Incremental scope (`--diff` / `--pr`).** When set, the chair first lists the
   changed files (`git diff --name-only <range>`, or `gh pr diff <n> --name-only`)

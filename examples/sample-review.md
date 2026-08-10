@@ -10,11 +10,15 @@ run on a real repo, see [`real-review-boardroom-v0.6.md`](real-review-boardroom-
 
 `acme-billing` · boardroom · 8 hats
 
-# 🚨 NOT YET — **5.5/10**
+# 🚨 NOT YET · confidence: Medium — **5.5/10**
 
 > The core billing logic is solid, but a money-touching race condition and an
 > unauthenticated webhook make this unsafe for paying customers. **Two fixes gate
 > the launch** — neither is large. Ship after they land.
+>
+> **Confidence: Medium** — all three 🔴 blockers verified against source (3/3);
+> Security and SRE agree on the money-path risk, but the security hat hit the read cap
+> on the webhook layer, so coverage there is partial.
 
 ## Scorecard
 |  | Hat | Score | Verdict |
@@ -45,7 +49,7 @@ run on a real repo, see [`real-review-boardroom-v0.6.md`](real-review-boardroom-
 | Live `STRIPE_SECRET` committed to the repo | 🔴 | `config/secrets.ts:5` | rotate + move to env | ~30 min |
 | Dunning emails call the LLM per send, no cache | 🟡 | `src/email/dunning.ts:40` | cache on (customer, reason) | ~2 h |
 
-*Severity: 🔴 blocks shipping · 🟡 fix soon · 🟢 nice-to-have.*
+*Severity: 🔴 blocks shipping · 🟡 fix soon · 🟢 nice-to-have. All three 🔴 spot-checked against source — verified.*
 
 ## ⚖️ Decisions for you · 2
 - **Hit the EU launch date vs add idempotency first.** Product wants the announced
@@ -58,7 +62,10 @@ run on a real repo, see [`real-review-boardroom-v0.6.md`](real-review-boardroom-
 ## 📊 Summary (machine-readable)
 ```yaml
 decision: NOT_YET
+confidence: MEDIUM
 risk_score: 70   # money-touching + an open security hole
+hat_agreement: strong
+blockers_verified: 3/3
 hats: 8
 top_3_blockers:
   - unauthenticated stripe webhook (forged payment events)

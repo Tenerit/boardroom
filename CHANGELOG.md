@@ -3,6 +3,39 @@
 All notable changes to boardroom. Format follows [Keep a Changelog](https://keepachangelog.com);
 this project uses [semantic versioning](https://semver.org).
 
+## [0.8.0] — 2026-08-10
+### Added — reliability / trust layer (what a decision-grade review can't skip)
+- **Findings are verified before they gate a decision.** Before deciding, the chair
+  re-opens the cited source for every 🔴 ship-blocking finding and confirms it says
+  what the hat claimed. A citation that doesn't hold is marked `⚠ unverified` and no
+  longer counts toward the decision — same-model hats can hallucinate a `file:line`,
+  and an unverified blocker must not gate a ship call. Scoped to the decision-critical
+  findings, so it stays cheap.
+- **Per-hat `[seen]` / `[inferred]` risk tags + a per-hat Confidence.** Each hat marks
+  whether a risk was confirmed at the cited line or merely suspected, and rates its own
+  confidence (dropping it when the read cap forced a skip). A guess can no longer
+  masquerade as a confirmed finding.
+- **The decision carries a confidence** (High / Medium / Low), from hat agreement,
+  verification, and coverage. Low confidence reads as *"a prompt for human review, not
+  a verdict"*.
+- **Groupthink / unanimity flag.** Unanimous agreement is surfaced as a *caution*, not
+  a green light — same-model reviewers can share a blind spot — and the chair names the
+  independent evidence that would actually confirm the consensus.
+- **Hats score independently** — the discipline note tells each hat to give its honest
+  score even as the outlier, rather than soften toward an imagined consensus.
+- `confidence`, `hat_agreement`, and `blockers_verified` added to the machine-readable
+  summary.
+
+### Changed — positioning (honest against the current field)
+- Reframed the "vs other review tools" comparison around *persona / debate panels* (the
+  real competitor category) and added a **Trust signal** row. The strongest debate
+  panels verify more deeply but stay engineering-only and resolve conflict to one
+  verdict; boardroom keeps the no-right-answer trade-off for the human and now backs it
+  with verification + a confidence signal.
+- Softened the Cost-hat claim to what's defensible: it judges what *your* project's
+  LLM/API calls cost — a lens general "is this expensive?" takes miss — rather than
+  claiming no other panel touches cost at all.
+
 ## [0.7.0] — 2026-06-19
 ### Added — governance / decision-grade output (the moat, not new hats)
 - **"Flips to … if"** — every non-SHIP decision now states the single thing that
