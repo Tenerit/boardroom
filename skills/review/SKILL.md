@@ -68,6 +68,13 @@ per hat via its `model:` frontmatter.
      open (entrypoint, config, manifest), paste the key 5–15 lines *once* here so the
      hats don't each re-read the whole file. Orientation only — a hat may still open
      the file if a finding needs full context.
+   - **Ground truth (recommended):** run the cheap deterministic checks the repo
+     *already* declares and record the **results** in a `<ground_truth>` block — build /
+     typecheck, the test suite, lint, a secret grep, and whether each file you're about
+     to cite exists. These are facts a hat cannot hallucinate, and they are the cheapest
+     filter for the false positives that LLM reviewers over-produce. Only run what the
+     manifest declares; **never install or mutate** anything. One line per result. Skip
+     a check the repo doesn't support rather than inventing one.
 
 2. **Assemble the right board (you).** Honor an explicit selection first — `--hats=`
    (exact), else a depth mode (`--light`/`--standard`/`--deep`, dropping any hat
@@ -101,10 +108,15 @@ per hat via its `model:` frontmatter.
    findings — the opposite of the point.
 
 3. **Convene in parallel.** In a **single message**, call the `Agent` tool once
-   per seated hat (`subagent_type` = the `board-*` name). Give each the **same**
-   prompt (with its own assigned file list):
-   - the **brief + project map** from step 1, and the hat's **assigned files**,
+   per seated hat (`subagent_type` = the `board-*` name). Give every hat the **same
+   facts** (the map + ground truth) but **frame each one independently** — never a
+   single shared "here's what to look for", and never prime a hat with what another hat
+   is likely to find. Identical framing layers one interpretation on top of the shared
+   base model and manufactures false consensus (same-vendor panels already err together
+   ~60% of the time). Each hat's prompt:
+   - the **brief + project map + `<ground_truth>`** from step 1, and the hat's **assigned files**,
    - the target path,
+   - a lens-specific ask **in that discipline's own terms** — not a generic checklist,
    - "Read ONLY the files the map assigned to your hat, plus the shared excerpts
      already in the map. Don't re-derive the structure or open another hat's lane.
      **Hard cap: read at most N files** (N = 5 for `--light`, 8 for `--standard`,
@@ -126,9 +138,11 @@ per hat via its `model:` frontmatter.
 5. **Verify the load-bearing findings (you).** Every hat is the same base model — a
    confidently-worded finding can still be a hallucinated `file:line`. Before you
    decide, take the 🔴 ship-blocking findings and any finding the decision leans on,
-   and re-open the cited source to confirm it actually says what the hat claimed.
-   **Demote any finding whose citation doesn't hold** — drop it from the blockers and
-   mark it `⚠ unverified`; it must not gate the decision. This is scoped to the
+   and re-open the cited source to confirm it actually says what the hat claimed —
+   **and that it doesn't contradict the ground truth** (a 🔴 "no tests cover X" when the
+   suite passes, or "this won't build" when the build is green, is demoted).
+   **Demote any finding whose citation or claim doesn't hold** — drop it from the
+   blockers and mark it `⚠ unverified`; it must not gate the decision. This is scoped to the
    decision-critical findings only — a handful of reads, not a re-review — so it stays
    cheap. Track how many held (`blockers_verified: N/M`).
 
@@ -237,6 +251,16 @@ top_3_blockers:
   verification, and coverage. Unanimous agreement is a *caution*, not a guarantee —
   same-model reviewers can share a blind spot. Say what independent evidence would
   confirm a consensus instead of treating the consensus as the evidence.
+- **Anchor on facts, not just opinion.** Where a cheap deterministic check exists
+  (build, tests, lint, a grep, does-the-cited-line-exist), the chair runs it and a
+  finding that contradicts a green check is demoted. LLM hats over-flag; ground truth is
+  the cheapest noise filter — false positives are the #1 reason review tools lose trust.
+  Only run what the repo already declares; never install or mutate (hats stay read-only;
+  only the chair runs commands).
+- **Same facts, independent framing.** Every hat gets the same map + ground truth, but
+  each is framed in its own discipline's terms — not one shared checklist. Shared
+  framing on a shared base model breeds false consensus; independent framing is the
+  cheapest defense against it.
 - **Analysis only.** The board never edits, creates, or deletes project files.
 - **Incremental scope (`--diff` / `--pr`).** When set, the chair first lists the
   changed files (`git diff --name-only <range>`, or `gh pr diff <n> --name-only`)

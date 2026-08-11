@@ -3,7 +3,7 @@
 **Your project, reviewed by a board of experts — and handed a decision.**
 
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-8A2BE2)](https://docs.claude.com/en/docs/claude-code/plugins)
-[![version](https://img.shields.io/badge/version-0.8.0-green)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.9.0-green)](CHANGELOG.md)
 [![access: read-only](https://img.shields.io/badge/access-read--only-success)](#privacy)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -205,9 +205,22 @@ than signal. boardroom guards the verdict:
 - **Unanimity is flagged, not celebrated.** When the board fully agrees, the chair says
   so and names the independent evidence (a real run, a paying user, a benchmark) that
   would confirm it — consensus among same-model reviewers is a caution, not proof.
+- **Findings are anchored to facts, not just opinion.** The chair runs the cheap
+  deterministic checks the repo already declares (build, tests, lint, a secret grep,
+  does-the-cited-line-exist) and demotes any 🔴 that contradicts a green check. LLM
+  reviewers over-flag; ground truth is the cheapest filter for the false positives that
+  are the #1 reason review tools lose trust.
+- **Same facts, independent framing.** Every hat gets the same map + ground truth, but
+  each is framed in its own discipline's terms — never one shared checklist. Shared
+  framing on a shared base model manufactures false consensus.
 
 > boardroom doesn't pretend to a certainty it lacks. It exposes *structured, verified
 > disagreement* with a confidence attached — for a human to arbitrate.
+
+**Prove it yourself.** A stability harness in [`eval/`](eval/METHODOLOGY.md) runs the board
+N× on fixed fixtures and reports **decision variance** — the metric that actually measures
+whether a review board is reliable (single-run LLM verdicts are near-arbitrary). Reliability
+you can reproduce beats reliability you're asked to trust.
 
 ---
 

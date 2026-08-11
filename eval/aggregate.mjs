@@ -1,0 +1,97 @@
+#!/usr/bin/env node
+// boardroom stability aggregator — measures DECISION VARIANCE across repeated runs.
+//
+// The primary reliability metric for an LLM review board is not accuracy, it's
+// *consistency*: does the same project get the same DECISION run to run? Single-run
+// LLM verdicts are near-arbitrary (same-verdict rate falls to ~70% at temperature 1;
+// see "Rating Roulette", arXiv:2510.27106). A board you can trust must first be stable.
+//
+// Usage:
+//   1. Run `/boardroom:review` on each fixture N times (N >= 5).
+//   2. Save each report to eval/runs/<fixture>/run-<k>.md  (one subfolder per fixture).
+//   3. node eval/aggregate.mjs [runsDir]     (default: eval/runs)
+//
+// It reads the machine-readable ```yaml summary block from every report and reports,
+// per fixture: the decision distribution, the modal decision, a STABILITY score
+// (modal share, 1.0 = never flipped), and the risk_score spread. No dependencies.
+
+import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
+
+const runsDir = process.argv[2] ?? 'eval/runs';
+
+if (!existsSync(runsDir)) {
+  console.error(`No runs directory at "${runsDir}".`);
+  console.error('Create eval/runs/<fixture>/run-<k>.md from your board runs first — see eval/METHODOLOGY.md.');
+  process.exit(1);
+}
+
+// Pull decision / confidence / risk_score out of the report's ```yaml summary block.
+// Falls back to scanning the whole file if no fenced yaml block is present.
+function parseReport(text) {
+  const fenced = text.match(/```ya?ml\s*([\s\S]*?)```/i);
+  const body = fenced ? fenced[1] : text;
+  const field = (name) => {
+    const m = body.match(new RegExp(`^\\s*${name}:\\s*([^\\n#]+)`, 'im'));
+    return m ? m[1].trim() : null;
+  };
+  const decision = field('decision');
+  const confidence = field('confidence');
+  const riskRaw = field('risk_score');
+  const risk = riskRaw != null && /^\d+$/.test(riskRaw) ? Number(riskRaw) : null;
+  return { decision, confidence, risk };
+}
+
+function modal(arr) {
+  const counts = {};
+  for (const v of arr) counts[v ?? 'MISSING'] = (counts[v ?? 'MISSING'] || 0) + 1;
+  let best = null, bestN = -1;
+  for (const [k, n] of Object.entries(counts)) if (n > bestN) { best = k; bestN = n; }
+  return { counts, modal: best, modalN: bestN };
+}
+
+const fixtures = readdirSync(runsDir).filter((d) => statSync(join(runsDir, d)).isDirectory());
+if (fixtures.length === 0) {
+  console.error(`"${runsDir}" has no fixture subfolders. Expected eval/runs/<fixture>/run-*.md`);
+  process.exit(1);
+}
+
+const rows = [];
+let stabilitySum = 0;
+
+for (const fx of fixtures.sort()) {
+  const dir = join(runsDir, fx);
+  const files = readdirSync(dir).filter((f) => f.endsWith('.md'));
+  const parsed = files.map((f) => parseReport(readFileSync(join(dir, f), 'utf8')));
+  const n = parsed.length;
+  if (n === 0) continue;
+
+  const decisions = parsed.map((p) => p.decision);
+  const { counts, modal: modalDecision, modalN } = modal(decisions);
+  const stability = modalN / n; // share of runs landing on the modal decision
+  stabilitySum += stability;
+
+  const risks = parsed.map((p) => p.risk).filter((x) => x != null);
+  const riskMean = risks.length ? (risks.reduce((a, b) => a + b, 0) / risks.length).toFixed(0) : '—';
+  const riskSpread = risks.length ? `${Math.min(...risks)}–${Math.max(...risks)}` : '—';
+  const dist = Object.entries(counts).map(([k, v]) => `${k}×${v}`).join(' ');
+
+  rows.push({ fx, n, modalDecision, stability, riskMean, riskSpread, dist });
+}
+
+const overall = rows.length ? stabilitySum / rows.length : 0;
+
+// ---- report ----
+const pct = (x) => `${(x * 100).toFixed(0)}%`;
+console.log('\nboardroom decision-stability report');
+console.log('='.repeat(72));
+for (const r of rows) {
+  console.log(`\n${r.fx}   (${r.n} runs)`);
+  console.log(`  modal decision : ${r.modalDecision}`);
+  console.log(`  STABILITY      : ${pct(r.stability)}   ${r.stability < 1 ? '⚠ decision flipped between runs' : 'never flipped'}`);
+  console.log(`  distribution   : ${r.dist}`);
+  console.log(`  risk_score     : mean ${r.riskMean}, spread ${r.riskSpread}`);
+}
+console.log('\n' + '='.repeat(72));
+console.log(`OVERALL DECISION STABILITY: ${pct(overall)}  (mean modal-share across ${rows.length} fixtures)`);
+console.log('Primary metric — higher = more reliable. A fixture < 100% means the board\ngave the same project different verdicts on different runs.\n');

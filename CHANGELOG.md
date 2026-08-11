@@ -3,6 +3,24 @@
 All notable changes to boardroom. Format follows [Keep a Changelog](https://keepachangelog.com);
 this project uses [semantic versioning](https://semver.org).
 
+## [0.9.0] — 2026-08-11
+### Added — grounded verdict + a way to prove reliability
+- **Ground-truth anchoring.** The chair now gathers the cheap deterministic checks the
+  repo already declares (build / typecheck, tests, lint, a secret grep, does-the-cited-
+  line-exist) into a `<ground_truth>` block, and the verification step demotes any 🔴 that
+  contradicts a green check. LLM hats over-flag; facts are the cheapest filter for the
+  false positives that are the #1 reason review tools lose trust. Read-only — only the
+  chair runs commands, and only what the manifest declares (never install or mutate).
+- **Independent framing per hat.** Hats receive the same *facts* but are each framed in
+  their own discipline's terms — no single shared "here's what to look for". Identical
+  framing on one base model manufactures false consensus (same-vendor panels err together
+  ~60% of the time); independent framing is the cheapest defense against it.
+- **Reliability harness (`eval/`).** Three caricatural fixtures with unambiguous expected
+  decisions (clean → SHIP, broken → NOT_YET, unproven → NEEDS_PROOF), a zero-dependency
+  `aggregate.mjs` that reads the machine-readable summaries across repeated runs and
+  reports **decision variance** (the primary reliability metric — single-run LLM verdicts
+  are near-arbitrary), and `METHODOLOGY.md`. Run the board N× and publish the number.
+
 ## [0.8.0] — 2026-08-10
 ### Added — reliability / trust layer (what a decision-grade review can't skip)
 - **Findings are verified before they gate a decision.** Before deciding, the chair

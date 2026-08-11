@@ -1,0 +1,7 @@
+{
+  "name": "neuralguard",
+  "version": "3.0.0",
+  "description": "AI threat detection.",
+  "type": "module",
+  "license": "MIT"
+}

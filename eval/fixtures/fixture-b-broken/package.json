@@ -1,0 +1,7 @@
+{
+  "name": "paykit",
+  "version": "0.1.0",
+  "description": "Charge a customer's card.",
+  "type": "module",
+  "license": "MIT"
+}
