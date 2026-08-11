@@ -250,5 +250,5 @@ top_3_blockers:
 - **Be concrete.** "Improve error handling" is useless; "`api/index.ts:88`
   swallows the DB error and returns 200" is a finding. Hold the hats to it.
 - **Spend tokens once.** Build the project map before convening and pass it to
-  every hat, so seven reviewers don't each re-read the repo. Right-size the board
+  every hat, so the whole board doesn't re-read the repo. Right-size the board
   to the project (step 2).

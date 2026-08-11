@@ -1,9 +1,12 @@
 ---
 name: boardroom:review
-description: Run a full boardroom review of the current project
+description: Convene the boardroom review board over the current project
 ---
 
-Run the boardroom review skill on the current repository.
+Run the boardroom review skill in `skills/review/SKILL.md` as the chair.
 
-Use the review skill located in skills/review/SKILL.md.
-Pass the current working directory as the target.
+Arguments (a path, a depth mode, `--hats=`, `--debate`, `--diff`, `--pr`, `--weights`):
+$ARGUMENTS
+
+Pass every argument above straight through to the skill — the chair parses them.
+If no path is given, target the current working directory.

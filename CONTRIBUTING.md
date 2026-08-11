@@ -41,11 +41,16 @@ boardroom/
    ## <Role> verdict
    **Score:** X/10 — <one line>
    **Strengths:** …
-   **Risks:** <🔴/🟡/🟢 + file:line>
-   **Top 3 actions:** <ordered; effort S/M/L>
+   **Risks:** <🔴/🟡/🟢 + file:line; tag each [seen] or [inferred]>
+   **Top 3 actions:** <ordered; a concrete time estimate each — ~30 min, ~2 h, ~half a day>
+   **Key assumption:** <the one assumption your top risk rests on>
+   **Confidence:** <High / Medium / Low, given what you could read>
    **Cross-discipline flag:** <trade-off with another discipline, or "none">
    **Hard question for the team:** …
    ```
+   Also carry the shared **Discipline** block (the `[seen]`/`[inferred]` rule,
+   independent scoring, "say unknown, don't guess") — copy it from any existing hat.
+   These feed the chair's verification + confidence layer.
 4. Add a row to the board table **and** the smart-assembly rules in
    `skills/review/SKILL.md` so the chair knows when to seat it.
 5. Keep hats **read-only** (`tools: Read, Grep, Glob`) — the board never edits code.

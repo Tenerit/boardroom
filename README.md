@@ -143,7 +143,7 @@ the parts that *do* have a right answer.
 | 🏛️ **Architect** | system design, coupling, complexity, tech debt |
 | 🔒 **Security** | authz, secrets, injection, SSRF, supply chain |
 | 🛠️ **SRE** | reliability, failure modes, observability, deploy/rollback |
-| 🎯 **UX** | first-run friction, clarity, hierarchy, consistency |
+| 🎨 **UX** | first-run friction, clarity, hierarchy, consistency |
 | 📦 **Product** | who it's for, problem fit, scope, positioning |
 | 💰 **Investor** | moat, market, traction, kill-risks |
 | 🕵️ **Skeptic** | red-teams the headline claim and the load-bearing assumptions |
@@ -160,7 +160,7 @@ miss (seated only when your project actually calls a model).
 
 The `/boardroom:review` skill acts as the **chair**:
 
-1. **Recon once** → builds a shared project map (so seven hats don't each re-read the repo).
+1. **Recon once** → builds a shared project map (so the hats don't each re-read the repo).
 2. **Assembles the right board** → matches hats to the project type (a script gets 2 hats; a SaaS gets all of them).
 3. **Convenes in parallel** → each hat reviews its lane in its own context window.
 4. **Decides** → reconciles the verdicts into the decision + trade-offs report.
