@@ -46,18 +46,30 @@ if (fixtures.length === 0) {
   process.exit(1);
 }
 
-// Hooks off for the eval session: a user's own hooks (style rewriters, command
-// proxies, memory injectors) would change what the board sees or how it writes.
-// Tools are read-only; no --run-checks, so fixture code is never executed.
+// The eval session must match boardroom's default promise: read-only, no project code
+// executed, no network. `--allowedTools` alone is NOT enough — it adds to the user's own
+// permissions (an `auto` mode or `Bash(npm *)` allow rule let the chair run `npm view`
+// on the first real run). So:
+//   --restricted        drops code-running tools and WebFetch, ignores user/project
+//                       settings (their allow rules and permission mode), and confines
+//                       file tools to the working directory;
+//   --strict-mcp-config no MCP servers;
+//   --tools             only Read/Grep/Glob/Agent/Bash, and Bash is limited to
+//                       git/grep/ls/find — anything else is denied (no prompt in -p);
+//   --plugin-dir        loads boardroom from this repo (user settings, where plugins
+//                       are enabled, are ignored) — so the eval tests the working tree;
+//   --settings          hooks off, so user hooks can't rewrite what the board sees.
 const settingsDir = mkdtempSync(join(tmpdir(), 'br-settings-'));
 const settingsFile = join(settingsDir, 'settings.json');
 writeFileSync(settingsFile, JSON.stringify({ disableAllHooks: true }));
-const allowedTools = ['Read', 'Grep', 'Glob', 'Agent', 'Task',
-  'Bash(git:*)', 'Bash(grep:*)', 'Bash(ls:*)', 'Bash(find:*)'];
+const pluginDir = join(here, '..');
+const allowedTools = ['Read', 'Grep', 'Glob', 'Agent',
+  'Bash(git *)', 'Bash(grep *)', 'Bash(ls *)', 'Bash(find *)'];
 
 function runClaude(cwd, prompt) {
-  const argv = ['-p', prompt, '--output-format', 'json', '--settings', settingsFile,
-    '--allowedTools', ...allowedTools];
+  const argv = ['-p', prompt, '--output-format', 'json',
+    '--restricted', '--strict-mcp-config', '--settings', settingsFile, '--plugin-dir', pluginDir,
+    '--tools', 'Read,Grep,Glob,Agent,Bash', '--allowedTools', ...allowedTools];
   if (argv.some((a) => a.includes('"'))) throw new Error('unexpected quote in an argument');
   // shell: true so Windows resolves the npm `claude.cmd` shim; every argument is quoted.
   const cmd = ['claude', ...argv.map((a) => `"${a}"`)].join(' ');
@@ -123,11 +135,15 @@ for (const fx of fixtures) {
     writeFileSync(join(outDir, `run-${k}.md`), j.result ?? '');
     const decision = (j.result?.match(/^\s*decision:\s*([A-Z_]+)/m) ?? [])[1] ?? null;
     spent += j.total_cost_usd ?? 0;
+    // What the board tried and was refused (e.g. running code, network lookups) — worth
+    // reading: it shows where the chair reaches beyond the read-only promise.
+    const denied = (j.permission_denials ?? []).map((d) =>
+      `${d.tool_name}:${JSON.stringify(d.tool_input?.command ?? d.tool_input ?? '').slice(0, 80)}`);
     appendFileSync(join(outRoot, 'costs.jsonl'), JSON.stringify({
       fixture: fx, run: k, depth, stage, decision,
-      cost_usd: j.total_cost_usd, duration_ms: j.duration_ms, at: new Date().toISOString(),
+      cost_usd: j.total_cost_usd, duration_ms: j.duration_ms, denied, at: new Date().toISOString(),
     }) + '\n');
-    console.log(`${decision ?? 'NO DECISION'}  $${(j.total_cost_usd ?? 0).toFixed(2)}`);
+    console.log(`${decision ?? 'NO DECISION'}  $${(j.total_cost_usd ?? 0).toFixed(2)}${denied.length ? `  (${denied.length} denied)` : ''}`);
   }
 }
 rmSync(settingsDir, { recursive: true, force: true });

@@ -48,9 +48,13 @@ node eval/aggregate.mjs          # the report
 ```
 
 `run.mjs` (zero dependencies) runs `claude -p "/boardroom:review --light --stage=…"`
-headless in each neutral copy, with the user's hooks disabled (so style rewriters or
-command proxies don't change what the board sees) and read-only tools only — fixture code
-is never executed. Runs are **appended** to `eval/runs/<fixture>/run-<k>.md`, with
+headless in each neutral copy with `--restricted`: your settings are ignored (no `auto`
+mode, no allow rules), code-running tools and WebFetch are removed, Bash is limited to
+`git` / `grep` / `ls` / `find`, there are no MCP servers and no hooks — so fixture code is
+never executed and nothing goes to the network. `--allowedTools` alone isn't enough: it
+*adds* to your own permissions, which let the chair run `npm view` on the first real run.
+The plugin is loaded with `--plugin-dir` from this repo, so the eval tests the working
+tree, not the installed version. Anything the board tried and was refused is logged. Runs are **appended** to `eval/runs/<fixture>/run-<k>.md`, with
 decision, cost and duration logged to `eval/runs/costs.jsonl`. It stops on the first error
 (e.g. an expired login); re-run to continue. `eval/runs/` is gitignored — commit the
 *number*, not the runs.

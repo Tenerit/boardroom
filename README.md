@@ -227,7 +227,7 @@ than signal. boardroom guards the verdict:
   would confirm it — consensus among same-model reviewers is a caution, not proof.
 - **Findings are anchored to facts, not just opinion.** The chair gathers facts a model
   can't invent — does the cited file exist, a secret grep, are there tests / a lockfile /
-  CI, the last CI status — and demotes any 🔴 that contradicts them. With
+  CI config, git history — and demotes any 🔴 that contradicts them. With
   `--run-checks` it also runs the repo's own build and tests. LLM reviewers over-flag;
   ground truth is the cheapest filter for the false positives that are the #1 reason
   review tools lose trust.
@@ -262,10 +262,26 @@ Good additions: `board-legal`, `board-data` (privacy/compliance), `board-perf`.
 boardroom runs entirely inside your Claude Code session against your local files. It
 adds no network calls of its own and the hats never write to your project.
 
-By default it also **never executes the project's code** — safe to point at a repo you
-don't trust yet (due diligence). `--run-checks` is the one exception: it runs the build,
-test and lint scripts the repo declares, which can do anything that code does (reach the
-network, write files, touch a database). Use it only on repos you trust.
+By default it also **never executes the project's code** and makes no network lookups.
+Two flags are the exceptions: `--run-checks` runs the build, test and lint scripts the
+repo declares (they can do anything that code does — reach the network, write files,
+touch a database; use it only on repos you trust), and `--pr` uses `gh` to fetch the
+pull request.
+
+**How strong is that guarantee?** The hats are limited by their own definitions to
+`Read`, `Grep` and `Glob` — they *can't* run anything. The chair runs in your session with
+**your** permissions, so its read-only, offline behaviour is an instruction it follows,
+not a hard wall: if your session auto-approves `npm` or web tools, a chair could still
+reach for them. For a hard guarantee on a repo you don't trust, run it headless with
+code-running tools removed:
+
+```bash
+claude -p "/boardroom:review" --restricted --strict-mcp-config --plugin-dir <path-to-boardroom> --tools "Read,Grep,Glob,Agent,Bash" --allowedTools "Bash(git *)" "Bash(grep *)" "Bash(ls *)" "Bash(find *)"
+```
+
+`--restricted` ignores your settings and drops the tools that run code or fetch from the
+web; Bash is then limited to `git`, `grep`, `ls` and `find`. This is how boardroom's own
+eval runs (`eval/run.mjs`).
 
 ## License
 

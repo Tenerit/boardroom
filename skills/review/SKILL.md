@@ -67,14 +67,16 @@ structure. The map goes to every hat, so each line costs ×N — keep it tight:
   instead of all opening the same core files.
 - **Shared excerpts** (optional) — the key 5–15 lines of the 2–4 files every hat would
   otherwise open (entrypoint, config, manifest), pasted once.
-- **`<ground_truth>`** — facts a hat cannot hallucinate, one line each, gathered
-  **without executing project code**: whether each file you'll cite exists; a secret
-  grep (live keys, private keys, tokens); whether there are tests, a lockfile and CI
-  config; the last CI status if `gh` is available; `git` facts (last commit, release
-  tags). With **`--run-checks`** only, also run the build / typecheck / test / lint
-  scripts the manifest declares and record pass or fail. Never run them by default: in a
-  repo under review they are untrusted code that can reach the network, write files or
-  touch databases. Never install anything.
+- **`<ground_truth>`** — facts a hat cannot hallucinate, one line each, gathered from
+  local files only: whether each file you'll cite exists; a secret grep (live keys,
+  private keys, tokens); whether there are tests, a lockfile and CI config; `git` facts
+  (last commit, release tags). **Never execute project code** — not its files, not a
+  copy, not a re-typed snippet of it — and make **no network lookups** (package
+  registries such as `npm view`, `curl`, the web). If a finding needs either, mark it
+  `[inferred]` and name the check that would settle it. With **`--run-checks`** only, run
+  the build / typecheck / test / lint scripts the manifest declares and record pass or
+  fail: in a repo under review they are untrusted code that can reach the network, write
+  files or touch databases. Never install anything.
 
 For `--diff` / `--pr`, list the changed files (`git diff --name-only <range>` or
 `gh pr diff <n> --name-only`) and build the map from those plus their direct dependents.
@@ -251,7 +253,8 @@ top_3_blockers:
   biggest single source of noise.
 - **Be concrete.** "Improve error handling" is useless; "`api/index.ts:88` swallows the
   DB error and returns 200" is a finding. Hold the hats to it.
-- **Read-only, and code-free by default.** The board never edits, creates or deletes
-  project files, and never executes project code unless `--run-checks` is given. Only
-  the chair runs commands.
+- **Read-only, code-free and offline by default.** The board never edits, creates or
+  deletes project files, never executes project code (or a copy of it), and makes no
+  network calls — unless `--run-checks` (the declared scripts only) or `--pr` (`gh`
+  fetches the diff) is given. Only the chair runs commands.
 - **Spend tokens once.** One recon, disjoint reads, a right-sized board.

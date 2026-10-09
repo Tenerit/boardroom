@@ -4,13 +4,37 @@ All notable changes to boardroom. Format follows [Keep a Changelog](https://keep
 this project uses [semantic versioning](https://semver.org).
 
 ## [Unreleased]
-### Fixed — eval harness (no change to the plugin itself)
+### Security
+- **Closed a loophole in the no-execution rule.** On the first real eval run the chair
+  checked a claim by running an inline copy of the project's code ("I didn't execute the
+  project's own code") and looked the package up with `npm view`. The rule now says: no
+  project code — not its files, not a copy, not a re-typed snippet — and no network
+  lookups; anything that would need them is marked `[inferred]` with the check that
+  would settle it. `gh` CI status left the default ground truth (it's a network call);
+  `gh` now only runs for `--pr`.
+- **The privacy section is honest about how strong the guarantee is.** Hats are limited
+  to Read/Grep/Glob by their own definitions; the chair runs with the user's permissions,
+  so its offline, code-free behaviour is an instruction, not a wall. The README gives the
+  `claude -p … --restricted` command for a hard guarantee on an untrusted repo.
+
+### Fixed — eval harness
 - **The eval fixtures leaked their own answers.** The first real headless run (v0.11.0,
   `--light`) got the right verdict on the broken fixture — and quoted the fixture's header
   comment, which listed the planted bugs. README warnings ("deliberately broken"), folder
   names (`fixture-b-broken`) and an `EXAMPLE` key gave the rest away. Fixtures are now
   neutral (`slugify`, `paykit`, `neuralguard`, no explanatory comments), and expected
   outcomes and pinned stages moved to `eval/expected.json`, outside the reviewed folders.
+- **`--allowedTools` didn't restrict anything** — it adds to the user's own permissions,
+  so an `auto` mode with `npm`/`node` allow rules let the chair run them. The runner now
+  uses `--restricted` (settings ignored, code-running tools and WebFetch removed),
+  `--strict-mcp-config`, `--tools Read,Grep,Glob,Agent,Bash` with Bash limited to
+  git/grep/ls/find, and `--plugin-dir` (plugins enabled in user settings no longer load).
+  Refused tool calls are logged per run.
+- **The `slugify` fixture wasn't a clean 1.0 package.** The board rightly blocked it at
+  `ga`: no `exports`, an npm name already taken, and undocumented lossy output for
+  non-Latin text. It's now a real 1.0 package (scoped name, `exports`, documented
+  Latin-only contract pinned by 8 tests, transliteration of ß/æ/ø/œ/ł/đ/þ/ð, `TypeError`
+  on non-strings, LICENSE, CI). The run made under the leaky permissions was discarded.
 
 ### Added
 - **`eval/run.mjs`** — runs the board headless (`claude -p`) on each fixture N times, each
