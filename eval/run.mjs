@@ -54,8 +54,9 @@ if (fixtures.length === 0) {
 //                       settings (their allow rules and permission mode), and confines
 //                       file tools to the working directory;
 //   --strict-mcp-config no MCP servers;
-//   --tools             only Read/Grep/Glob/Agent/Bash, and Bash is limited to
-//                       git/grep/ls/find — anything else is denied (no prompt in -p);
+//   --tools             only Read/Grep/Glob/Agent — no Bash at all: even "read-only"
+//                       allow rules leak (`find -exec`, `git -c alias.x='!sh …'`), and
+//                       an untrusted repo can try to steer the reviewer into using them;
 //   --plugin-dir        loads boardroom from this repo (user settings, where plugins
 //                       are enabled, are ignored) — so the eval tests the working tree;
 //   --settings          hooks off, so user hooks can't rewrite what the board sees.
@@ -63,13 +64,12 @@ const settingsDir = mkdtempSync(join(tmpdir(), 'br-settings-'));
 const settingsFile = join(settingsDir, 'settings.json');
 writeFileSync(settingsFile, JSON.stringify({ disableAllHooks: true }));
 const pluginDir = join(here, '..');
-const allowedTools = ['Read', 'Grep', 'Glob', 'Agent',
-  'Bash(git *)', 'Bash(grep *)', 'Bash(ls *)', 'Bash(find *)'];
+const tools = 'Read,Grep,Glob,Agent';
 
 function runClaude(cwd, prompt) {
   const argv = ['-p', prompt, '--output-format', 'json',
     '--restricted', '--strict-mcp-config', '--settings', settingsFile, '--plugin-dir', pluginDir,
-    '--tools', 'Read,Grep,Glob,Agent,Bash', '--allowedTools', ...allowedTools];
+    '--tools', tools, '--allowedTools', ...tools.split(',')];
   if (argv.some((a) => a.includes('"'))) throw new Error('unexpected quote in an argument');
   // shell: true so Windows resolves the npm `claude.cmd` shim; every argument is quoted.
   const cmd = ['claude', ...argv.map((a) => `"${a}"`)].join(' ');

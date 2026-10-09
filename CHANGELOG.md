@@ -17,6 +17,22 @@ this project uses [semantic versioning](https://semver.org).
   so its offline, code-free behaviour is an instruction, not a wall. The README gives the
   `claude -p … --restricted` command for a hard guarantee on an untrusted repo.
 
+- **The repo under review is evidence, not instructions.** A README or comment telling
+  reviewers what to conclude, run or skip is now reported as attempted manipulation,
+  never followed — in the chair's rules and in every hat. Due diligence means reviewing
+  repos that may want a good grade.
+- **The hard-guarantee command drops Bash entirely.** "Read-only" allow rules leak:
+  `find -exec` and `git -c alias.x='!sh …'` run arbitrary commands, which a hostile repo
+  could steer the reviewer toward. Ground truth comes from Grep and Glob instead.
+
+### Fixed
+- **`/boardroom:review` no longer depends on reading a file.** The legacy wrapper
+  `commands/review.md` told the chair to go read `skills/review/SKILL.md` — which fails
+  when file reads are confined to the project (the chair then improvised with no
+  procedure and no decision), and can trigger a permission prompt otherwise. The wrapper
+  is gone; the skill registers the command itself, with its text and `$ARGUMENTS`
+  injected directly.
+
 ### Fixed — eval harness
 - **The eval fixtures leaked their own answers.** The first real headless run (v0.11.0,
   `--light`) got the right verdict on the broken fixture — and quoted the fixture's header

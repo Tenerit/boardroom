@@ -276,11 +276,13 @@ reach for them. For a hard guarantee on a repo you don't trust, run it headless 
 code-running tools removed:
 
 ```bash
-claude -p "/boardroom:review" --restricted --strict-mcp-config --plugin-dir <path-to-boardroom> --tools "Read,Grep,Glob,Agent,Bash" --allowedTools "Bash(git *)" "Bash(grep *)" "Bash(ls *)" "Bash(find *)"
+claude -p "/boardroom:review" --restricted --strict-mcp-config --plugin-dir <path-to-boardroom> --tools "Read,Grep,Glob,Agent" --allowedTools Read Grep Glob Agent
 ```
 
 `--restricted` ignores your settings and drops the tools that run code or fetch from the
-web; Bash is then limited to `git`, `grep`, `ls` and `find`. This is how boardroom's own
+web. Bash is left out entirely: even "read-only" commands can run others (`find -exec`,
+`git -c alias…`), and a hostile repo can try to talk the reviewer into using them. The
+chair gathers its ground truth with Grep and Glob instead. This is how boardroom's own
 eval runs (`eval/run.mjs`).
 
 ## License

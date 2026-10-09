@@ -49,8 +49,8 @@ node eval/aggregate.mjs          # the report
 
 `run.mjs` (zero dependencies) runs `claude -p "/boardroom:review --light --stage=…"`
 headless in each neutral copy with `--restricted`: your settings are ignored (no `auto`
-mode, no allow rules), code-running tools and WebFetch are removed, Bash is limited to
-`git` / `grep` / `ls` / `find`, there are no MCP servers and no hooks — so fixture code is
+mode, no allow rules), code-running tools and WebFetch are removed, and so is Bash (even
+`find` and `git` can run other commands), there are no MCP servers and no hooks — so fixture code is
 never executed and nothing goes to the network. `--allowedTools` alone isn't enough: it
 *adds* to your own permissions, which let the chair run `npm view` on the first real run.
 The plugin is loaded with `--plugin-dir` from this repo, so the eval tests the working
