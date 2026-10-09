@@ -12,11 +12,17 @@ confidently *inconsistent*.
 Three caricatural repos, each with an unambiguous "right" decision — so any run-to-run
 flip is the *board's* inconsistency, not genuine ambiguity in the project:
 
-| Fixture | What it is | Expected decision |
-| --- | --- | --- |
-| `fixture-a-clean` | a tiny, tested, honest util | **SHIP** |
-| `fixture-b-broken` | committed secret + a double-charge money bug | **NOT_YET** |
-| `fixture-c-unproven` | grand claims, a coin-flip implementation, no tests | **NEEDS_PROOF** |
+| Fixture | What it is | Pinned stage | Expected decision |
+| --- | --- | --- | --- |
+| `fixture-a-clean` | a tiny, tested, honest util | `ga` | **SHIP** |
+| `fixture-b-broken` | committed secret + a double-charge money bug | `alpha` | **NOT_YET** |
+| `fixture-c-unproven` | grand "enterprise-ready" claims, a coin-flip implementation, no tests | `ga` | **NEEDS_PROOF** |
+
+**Pin the stage.** The board infers a project's lifecycle stage when `--stage` is omitted,
+and that inference can itself wobble between runs — which would show up as decision
+variance that isn't the board's judgement. Pass the pinned stage so the harness measures
+one thing. (To measure stage inference on its own, run once without `--stage` and look
+at the `stage` spread in the output.)
 
 ## Run it
 
@@ -24,9 +30,9 @@ From the boardroom repo root, with the plugin loaded, run each fixture **N ≥ 5
 save every report under `eval/runs/<fixture>/`:
 
 ```
-/boardroom:review eval/fixtures/fixture-a-clean --standard
+/boardroom:review eval/fixtures/fixture-a-clean --standard --stage=ga
 #   -> save the report to eval/runs/fixture-a-clean/run-1.md
-#   repeat N times per fixture (run-1.md … run-N.md)
+#   repeat N times per fixture (run-1.md … run-N.md), same flags each time
 
 node eval/aggregate.mjs eval/runs
 ```

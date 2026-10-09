@@ -36,10 +36,11 @@ function parseReport(text) {
     return m ? m[1].trim() : null;
   };
   const decision = field('decision');
+  const stage = field('stage');
   const confidence = field('confidence');
   const riskRaw = field('risk_score');
   const risk = riskRaw != null && /^\d+$/.test(riskRaw) ? Number(riskRaw) : null;
-  return { decision, confidence, risk };
+  return { decision, stage, confidence, risk };
 }
 
 function modal(arr) {
@@ -76,7 +77,13 @@ for (const fx of fixtures.sort()) {
   const riskSpread = risks.length ? `${Math.min(...risks)}–${Math.max(...risks)}` : '—';
   const dist = Object.entries(counts).map(([k, v]) => `${k}×${v}`).join(' ');
 
-  rows.push({ fx, n, modalDecision, stability, riskMean, riskSpread, dist });
+  // Stage the board judged against. More than one value means stage inference itself
+  // wobbled — pin it with --stage so decision variance measures the board's judgement.
+  const stageCounts = modal(parsed.map((p) => p.stage)).counts;
+  const stageDist = Object.entries(stageCounts).map(([k, v]) => `${k}×${v}`).join(' ');
+  const stageWobble = Object.keys(stageCounts).length > 1;
+
+  rows.push({ fx, n, modalDecision, stability, riskMean, riskSpread, dist, stageDist, stageWobble });
 }
 
 const overall = rows.length ? stabilitySum / rows.length : 0;
@@ -90,6 +97,7 @@ for (const r of rows) {
   console.log(`  modal decision : ${r.modalDecision}`);
   console.log(`  STABILITY      : ${pct(r.stability)}   ${r.stability < 1 ? '⚠ decision flipped between runs' : 'never flipped'}`);
   console.log(`  distribution   : ${r.dist}`);
+  console.log(`  stage          : ${r.stageDist}${r.stageWobble ? '   ⚠ stage varied — pin it with --stage' : ''}`);
   console.log(`  risk_score     : mean ${r.riskMean}, spread ${r.riskSpread}`);
 }
 console.log('\n' + '='.repeat(72));

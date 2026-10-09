@@ -10,7 +10,7 @@ run on a real repo, see [`real-review-boardroom-v0.6.md`](real-review-boardroom-
 
 `acme-billing` · boardroom · 8 hats
 
-# 🚨 NOT YET · confidence: Medium — **5.5/10**
+# 🚨 NOT YET · stage: ga · confidence: Medium — **5.5/10**
 
 > The core billing logic is solid, but a money-touching race condition and an
 > unauthenticated webhook make this unsafe for paying customers. **Two fixes gate
@@ -62,6 +62,7 @@ run on a real repo, see [`real-review-boardroom-v0.6.md`](real-review-boardroom-
 ## 📊 Summary (machine-readable)
 ```yaml
 decision: NOT_YET
+stage: GA   # paying customers — the full bar applies
 confidence: MEDIUM
 risk_score: 70   # money-touching + an open security hole
 hat_agreement: strong

@@ -3,7 +3,7 @@
 **Your project, reviewed by a board of experts — and handed a decision.**
 
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-8A2BE2)](https://docs.claude.com/en/docs/claude-code/plugins)
-[![version](https://img.shields.io/badge/version-0.9.0-green)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.10.0-green)](CHANGELOG.md)
 [![access: read-only](https://img.shields.io/badge/access-read--only-success)](#privacy)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -45,7 +45,7 @@ fit — boardroom is for **whole-project, ship/no-ship judgment**.
 ```
 # Boardroom review — acme-billing
 
-## Decision: NOT YET · confidence: Medium
+## Decision: NOT YET · stage: ga · confidence: Medium
 Core billing logic is solid, but a money-touching race condition and an
 unauthenticated webhook make this unsafe for paying customers. Two fixes gate it.
 
@@ -95,8 +95,27 @@ Or install from the marketplace:
 | Specific hats only | `/boardroom:review --hats=security,sre` |
 | Scope to a folder | `/boardroom:review src/` |
 | A rebuttal round on the conflicts | add `--debate` |
+| Judge it for where it is in its lifecycle | `/boardroom:review --stage=beta` |
 
-No flag? The chair auto-sizes the board to the project.
+No flag? The chair auto-sizes the board to the project and infers its stage.
+
+### Judged for its stage
+
+A prototype and a product you sell are not held to the same bar. boardroom reads the
+project's lifecycle stage — `dev` · `alpha` · `beta` · `ga` (commercialisation) — from its
+version, badges, releases, CI and users, or takes it from `--stage`. The stage changes
+**who leads the board** and **how harsh each hat is**:
+
+| Stage | The board asks | Not a blocker yet |
+| --- | --- | --- |
+| `dev` | Is the approach sound — are we fooling ourselves? | tests, monitoring, docs, moat |
+| `alpha` | Does the core loop work for a few friendly users? | polish, scale, onboarding |
+| `beta` | Is it safe and usable for real users? | some rough edges (not data loss or auth holes) |
+| `ga` | Is it safe to sell, and will it hold? | — everything counts |
+
+"No tests" is a 🟢 on a prototype and a 🔴 on a paying-customer release. A committed live
+secret or exposed user data blocks at every stage. The decision always names the stage,
+so **SHIP as a beta** is never mistaken for "ready for GA".
 
 ### Review every PR ⭐
 

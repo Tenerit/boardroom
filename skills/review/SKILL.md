@@ -25,6 +25,7 @@ May contain a path, a depth mode, a hat selection, and/or `--debate`:
 - **`--diff <range>`** — review only what changed (e.g. `--diff HEAD~10..HEAD`). Incremental / pre-merge review.
 - **`--pr <number>`** — review a GitHub pull request's diff (the chair fetches it with `gh`).
 - **`--weights hat=N,…`** — weight hats in the final synthesis (e.g. `--weights security=3,sre=2`); higher = more pull on the decision and `risk_score`. Default = 1 each.
+- **`--stage <dev|alpha|beta|ga>`** — the project's lifecycle stage; it **calibrates how harsh the board is** and which hats sit (step 2). Aliases: `prototype`/`poc`→dev, `commercial`/`production`/`prod`/`launch`→ga. Omitted → the chair infers the stage in recon.
 - a path (e.g. `src/`) scopes the review; default = current working directory.
 
 If neither a mode nor `--hats=` is given, fall back to smart assembly (step 2).
@@ -60,6 +61,14 @@ per hat via its `model:` frontmatter.
      says whether the **business** hats have anything real to judge. Signals: pricing /
      billing / a company / funding language → commercial; a single-author MIT tool with
      no monetization → hobby OSS.
+   - **Stage:** the lifecycle stage — *dev / prototype* · *alpha* · *beta* · *ga
+     (commercialisation / production)*. Honor `--stage` if given; otherwise infer it
+     from signals: `0.x` versions, `WIP` / `experimental` / `alpha` / `beta` badges or
+     wording → earlier; `1.x`+, a CHANGELOG with real releases, CI/CD, deploy config,
+     monitoring, real or paying users, a pricing page → later. State the stage and how
+     sure you are (one line) so the user can correct it. Stage recalibrates **both**
+     seating and severity (step 2) — the biggest single guard against judging a
+     prototype by production standards.
    - **Key files → assigned:** ≤20 lines, `path — one phrase — → hat(s)`. Annotate
      each load-bearing file AND assign it to the 1–2 hats that most need it, so the
      hats read **disjoint** sets instead of all opening the same core files (the #1
@@ -107,6 +116,23 @@ per hat via its `model:` frontmatter.
    Running a business hat on a project with no business produces confident, useless
    findings — the opposite of the point.
 
+   **Then calibrate to the stage (step 1).** Stage changes *who leads* and *how harsh
+   the board is*. It layers on the depth mode and project type; an explicit `--hats=`
+   overrides seating, but the stage **still calibrates severity**.
+
+   | Stage | Who leads | The question the board answers | Not a blocker at this stage |
+   | --- | --- | --- | --- |
+   | **dev / prototype** | architect + skeptic; security/sre light; investor/pm/ux only if asked; cost only if it calls an LLM (runaway spend only) | *Is the approach sound, and are we fooling ourselves?* | missing tests, no monitoring, rough structure, no docs, no moat, no pricing |
+   | **alpha** | + security if it touches real data; core-path correctness | *Does the core loop work for a few friendly users?* | polish, scale, observability depth, onboarding, market proof |
+   | **beta** | + sre, ux, product | *Is it safe and usable for real users?* | some rough edges and tech debt — but **not** data loss, auth holes, or broken first run |
+   | **ga / commercialisation** | **full board**; weight security, sre, cost (+ investor/pm if commercial) | *Is it safe to sell to paying customers, and will it hold?* | — everything counts |
+
+   **Severity is stage-relative.** Score each finding against the stage, not against an
+   absolute production bar: "no tests" is 🟢 at dev, 🟡 at beta, 🔴 at ga; "no
+   monitoring" is ignorable at dev and a 🔴 at ga; a thin moat is noise at dev and a real
+   blocker at commercialisation. What never relaxes, at any stage: a committed live
+   secret, real user data exposed, or a core approach that cannot work.
+
 3. **Convene in parallel.** In a **single message**, call the `Agent` tool once
    per seated hat (`subagent_type` = the `board-*` name). Give every hat the **same
    facts** (the map + ground truth) but **frame each one independently** — never a
@@ -116,6 +142,8 @@ per hat via its `model:` frontmatter.
    ~60% of the time). Each hat's prompt:
    - the **brief + project map + `<ground_truth>`** from step 1, and the hat's **assigned files**,
    - the target path,
+   - the **stage** and its question from the step-2 table — "calibrate every severity to
+     this stage; don't score a prototype by a production bar",
    - a lens-specific ask **in that discipline's own terms** — not a generic checklist,
    - "Read ONLY the files the map assigned to your hat, plus the shared excerpts
      already in the map. Don't re-derive the structure or open another hat's lane.
@@ -164,8 +192,10 @@ per hat via its `model:` frontmatter.
 ```
 # Boardroom review — <project>
 
-## Decision: <SHIP · SHIP WITH FIXES · NOT YET · NEEDS PROOF> · confidence: <High · Medium · Low>
-<2–3 sentences: the call + the 1–3 things gating it. Be willing to say "don't ship".>
+## Decision: <SHIP · SHIP WITH FIXES · NOT YET · NEEDS PROOF> · stage: <dev · alpha · beta · ga> · confidence: <High · Medium · Low>
+<2–3 sentences: the call + the 1–3 things gating it, **read against the stage** — say
+what the decision means here ("ready to put in front of beta users", "approach is sound,
+keep building"). SHIP *as a beta* is not "ready for GA". Be willing to say "don't ship".>
 
 **Confidence: <High · Medium · Low>** — <one line on *why* the board is this sure:
 hat agreement (aligned / split), verification (N/M blockers confirmed in source), and
@@ -198,7 +228,8 @@ always say what's actually good before what's broken.>
 | ----- | :-: | ----- | -------------- | ---- |
 | <issue — note "(2+ hats)" if consensus> | 🔴 | `file:line` | <the concrete change> | ~30 min |
 
-Severity: 🔴 blocks shipping · 🟡 fix soon · 🟢 nice-to-have.
+Severity: 🔴 blocks shipping · 🟡 fix soon · 🟢 nice-to-have — **scored against the
+project's stage**, not an absolute production bar (step 2).
 Time = a real estimate per row (`~30 min`, `~2 h`, `~half a day`, `~1 day`) — never an abbreviation to decode.
 Verification: the chair spot-checks every 🔴 against its cited source before it may
 gate the decision (step 5). A blocker whose citation didn't hold is marked `⚠ unverified`
@@ -223,6 +254,7 @@ stings, the reader knows the real risk in trusting it.>
 ## Summary (machine-readable — for tracking across projects)
 ```yaml
 decision: SHIP | SHIP_WITH_FIXES | NOT_YET | NEEDS_PROOF
+stage: DEV | ALPHA | BETA | GA   # the decision is relative to this
 confidence: HIGH | MEDIUM | LOW
 flips_if: <the one thing that would change the decision; null if already SHIP>
 risk_score: <0-100, higher = riskier to ship>
@@ -271,6 +303,12 @@ top_3_blockers:
   hat's risks pull harder on the Decision and `risk_score`. State the weighting in
   the report so the verdict stays interpretable (a bank weights security/SRE; a
   B2C SaaS weights UX/product).
+- **Judge the stage, not an ideal (`--stage`).** A project is reviewed against where it
+  is in its lifecycle. At dev/alpha the board asks "is the approach sound, does the core
+  work?" and missing tests, monitoring, polish or moat don't block; at ga everything
+  counts. Applying production standards to a prototype is the #1 source of noise. Always
+  name the stage in the decision so SHIP isn't misread. A few things block at every
+  stage: a committed live secret, exposed user data, an approach that cannot work.
 - **Be concrete.** "Improve error handling" is useless; "`api/index.ts:88`
   swallows the DB error and returns 200" is a finding. Hold the hats to it.
 - **Spend tokens once.** Build the project map before convening and pass it to

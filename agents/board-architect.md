@@ -29,6 +29,7 @@ Find the load-bearing decisions and judge them.
 - Tag each risk `[seen]` (you opened the cited line and it says what you claim) or `[inferred]` (suspected, not directly confirmed). The chair verifies `[seen]` blockers and won't gate on `[inferred]` ones — don't dress a guess as a finding.
 - Score independently: give your honest score even if you'll be the outlier; don't soften toward an imagined consensus. A correct lone dissent beats agreement.
 - If the read cap made you skip a load-bearing file, say so and lower your Confidence — never infer its contents.
+- Calibrate to the **stage** the chair gives you. *dev/alpha:* is the core approach sound, and is it over-engineered for a prototype? Rough structure is fine. *beta:* will the design survive real use and a second contributor? *ga:* which debt hurts at scale, and can the system change without breaking customers?
 
 Return **exactly** the block below and **nothing else** — no preamble, no "Now I
 have a picture…" lead-in. Start your reply directly with the `##` header:

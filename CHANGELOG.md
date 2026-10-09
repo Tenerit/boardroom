@@ -3,6 +3,29 @@
 All notable changes to boardroom. Format follows [Keep a Changelog](https://keepachangelog.com);
 this project uses [semantic versioning](https://semver.org).
 
+## [0.10.0] — 2026-10-09
+### Added — stage-aware review (dev · alpha · beta · ga)
+- **The board now judges a project for its lifecycle stage.** The chair infers the stage
+  in recon (version, `WIP`/`alpha`/`beta` badges, releases, CI/CD, monitoring, real or
+  paying users, pricing) or takes it from the new **`--stage <dev|alpha|beta|ga>`** flag
+  (aliases: `prototype`/`poc` → dev, `commercial`/`production`/`launch` → ga), and states
+  how sure it is so the user can correct it.
+- **Stage changes who leads.** dev → architect + skeptic ("is the approach sound?");
+  alpha → + security on real data; beta → + sre, ux, product; ga → the full board with
+  security, sre and cost weighted up. Layers on project type and intent; an explicit
+  `--hats=` still overrides seating.
+- **Severity is stage-relative.** The same finding is scored against the stage, not an
+  absolute production bar — "no tests" is 🟢 at dev, 🔴 at ga; a thin moat is noise at dev
+  and a blocker at commercialisation. Applying production standards to a prototype is the
+  biggest source of review noise. A committed live secret, exposed user data, or an
+  approach that cannot work still block at every stage.
+- **Each hat has its own stage lens** — security at dev looks only for live secrets and
+  data exposure, the full threat model at ga; the investor hat no longer scores missing
+  traction as a kill risk on a prototype; SRE says "nothing operational to flag yet" at
+  dev instead of inventing gaps.
+- The decision names the stage (`SHIP · stage: beta`), so SHIP as a beta isn't read as
+  "ready for GA"; `stage` added to the machine-readable summary.
+
 ## [0.9.0] — 2026-08-11
 ### Added — grounded verdict + a way to prove reliability
 - **Ground-truth anchoring.** The chair now gathers the cheap deterministic checks the
