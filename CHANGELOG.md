@@ -3,7 +3,15 @@
 All notable changes to boardroom. Format follows [Keep a Changelog](https://keepachangelog.com);
 this project uses [semantic versioning](https://semver.org).
 
-## [Unreleased]
+## [0.12.0] — 2026-10-09
+### Measured — first real stability number
+The board was run for real, headless, for the first time since v0.6: 15 runs (`--light`,
+Claude Opus 5.5, 5 per fixture). **100% decision stability** — every fixture got the same
+decision on all 5 runs — and 3/3 decisions in the expected set (slugify SHIP WITH FIXES,
+paykit NOT YET, neuralguard NOT YET), at $0.61 per run API-equivalent. Easy fixtures, one
+model, one day: it rules out a ~20% flip rate on clear-cut cases, not a 10% one, and says
+nothing yet about ambiguous projects. Those first real runs found every defect listed below.
+
 ### Security
 - **Closed a loophole in the no-execution rule.** On the first real eval run the chair
   checked a claim by running an inline copy of the project's code ("I didn't execute the

@@ -3,7 +3,7 @@
 **Your project, reviewed by a board of experts — and handed a decision.**
 
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-8A2BE2)](https://docs.claude.com/en/docs/claude-code/plugins)
-[![version](https://img.shields.io/badge/version-0.11.0-green)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.12.0-green)](CHANGELOG.md)
 [![access: read-only](https://img.shields.io/badge/access-read--only-success)](#privacy)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -242,6 +242,20 @@ than signal. boardroom guards the verdict:
 N× on fixed fixtures and reports **decision variance** — the metric that actually measures
 whether a review board is reliable (single-run LLM verdicts are near-arbitrary). Reliability
 you can reproduce beats reliability you're asked to trust.
+
+**Measured** (2026-10-09 · v0.12.0 · Claude Opus 5.5 · `--light` · 5 runs × 3 fixtures):
+
+| Fixture | Stage | Decision, 5 runs | `risk_score` | Expected |
+| --- | --- | --- | --- | --- |
+| `slugify` — a small, tested 1.0 package | ga | SHIP WITH FIXES ×5 | 35–35 | ✓ |
+| `paykit` — committed key, double charge on retry | alpha | NOT YET ×5 | 90–95 | ✓ |
+| `neuralguard` — "99.9%" claims over `Math.random()` | ga | NOT YET ×5 | 98–100 | ✓ |
+
+**100% decision stability** (15/15 runs on the modal decision) and 3/3 in the expected set,
+at **$0.61 per run** API-equivalent. Read it for what it is: easy fixtures with clear
+answers, one model, one day. Five runs per fixture rule out a ~20% flip rate on cases like
+these, not a 10% one, and say nothing yet about ambiguous projects. Run `node eval/run.mjs`
+to check it on your own model.
 
 ---
 
