@@ -3,6 +3,24 @@
 All notable changes to boardroom. Format follows [Keep a Changelog](https://keepachangelog.com);
 this project uses [semantic versioning](https://semver.org).
 
+## [Unreleased]
+### Fixed — eval harness (no change to the plugin itself)
+- **The eval fixtures leaked their own answers.** The first real headless run (v0.11.0,
+  `--light`) got the right verdict on the broken fixture — and quoted the fixture's header
+  comment, which listed the planted bugs. README warnings ("deliberately broken"), folder
+  names (`fixture-b-broken`) and an `EXAMPLE` key gave the rest away. Fixtures are now
+  neutral (`slugify`, `paykit`, `neuralguard`, no explanatory comments), and expected
+  outcomes and pinned stages moved to `eval/expected.json`, outside the reviewed folders.
+
+### Added
+- **`eval/run.mjs`** — runs the board headless (`claude -p`) on each fixture N times, each
+  in a fresh neutral temp copy with its own git history, the fixture's stage pinned, user
+  hooks off and read-only tools. Appends reports to `eval/runs/` and logs decision, cost
+  and duration to `costs.jsonl`; `--dry-run` shows the plan and the estimated cost
+  (first real `--light` run: $0.81 API-equivalent).
+- `aggregate.mjs` checks each modal decision against `expected.json` (accuracy, secondary)
+  and shows the mean cost per run.
+
 ## [0.11.0] — 2026-10-09
 ### Security
 - **The board no longer executes the reviewed project's code by default.** Since 0.9.0

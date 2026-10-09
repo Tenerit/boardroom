@@ -9,56 +9,74 @@ confidently *inconsistent*.
 
 ## Fixtures
 
-Three caricatural repos, each with an unambiguous "right" decision — so any run-to-run
-flip is the *board's* inconsistency, not genuine ambiguity in the project:
+Three small repos in `fixtures/`, each with an unambiguous right decision — so any
+run-to-run flip is the *board's* inconsistency, not genuine ambiguity in the project. The
+expected outcomes and pinned stages live in [`expected.json`](expected.json):
 
 | Fixture | What it is | Pinned stage | Expected decision |
 | --- | --- | --- | --- |
-| `fixture-a-clean` | a tiny, tested, honest util | `ga` | **SHIP** |
-| `fixture-b-broken` | committed secret + a double-charge money bug | `alpha` | **NOT_YET** |
-| `fixture-c-unproven` | grand "enterprise-ready" claims, a coin-flip implementation, no tests | `ga` | **NEEDS_PROOF** |
+| `slugify` | a tiny, tested, honest util | `ga` | **SHIP** (or SHIP_WITH_FIXES) |
+| `paykit` | hardcoded live key, double-charge on retry, failures reported as success | `alpha` | **NOT_YET** |
+| `neuralguard` | "99.9%, enterprise-ready" claims over a `Math.random()` classifier, no tests | `ga` | **NEEDS_PROOF** (or NOT_YET) |
 
-**Pin the stage.** The board infers a project's lifecycle stage when `--stage` is omitted,
-and that inference can itself wobble between runs — which would show up as decision
-variance that isn't the board's judgement. Pass the pinned stage so the harness measures
-one thing. (To measure stage inference on its own, run once without `--stage` and look
-at the `stage` spread in the output.)
+**Nothing the board reads may give the answer away.** The first real run (v0.11.0) caught
+the fixtures leaking it: a header comment listing the planted bugs, README warnings
+("deliberately broken"), folder names (`fixture-b-broken`) and an `EXAMPLE` key. The board
+quoted the leak back — so that run proved the pipeline, not detection. Since then:
+- fixtures contain only what a real project would (no explanatory comments or warnings);
+- expected outcomes sit in `expected.json`, outside the reviewed folders;
+- the runner reviews a fresh copy in a neutral temp folder (`…/Temp/proj-xxxx/paykit`),
+  with its own git history, so no path says "eval" or "fixture".
+
+When you add a fixture, keep the code honest-looking and put the answer in `expected.json`.
+
+**Pin the stage.** Without `--stage` the board infers the lifecycle stage, and that
+inference can itself wobble between runs — which would show up as decision variance that
+isn't the board's judgement. The runner always passes the pinned stage. (`aggregate.mjs`
+still prints the stage spread and warns if it varies.)
 
 ## Run it
 
-From the boardroom repo root, with the plugin loaded, run each fixture **N ≥ 5** times and
-save every report under `eval/runs/<fixture>/`:
+Needs `claude` on PATH and logged in (`claude auth status`; for long runs `claude
+setup-token` avoids an expiry midway) and the boardroom plugin installed.
 
 ```
-/boardroom:review eval/fixtures/fixture-a-clean --standard --stage=ga
-#   -> save the report to eval/runs/fixture-a-clean/run-1.md
-#   repeat N times per fixture (run-1.md … run-N.md), same flags each time
-
-node eval/aggregate.mjs eval/runs
+node eval/run.mjs --dry-run      # what would run, and the estimated cost
+node eval/run.mjs                # every fixture × 5 runs, --light
+node eval/run.mjs --only paykit --runs 2 --depth standard
+node eval/aggregate.mjs          # the report
 ```
 
-`aggregate.mjs` (zero dependencies) reads the machine-readable ` ```yaml ` summary from
-every report and prints, per fixture: the decision distribution, the modal decision, a
-**STABILITY** score (modal share; 1.0 = never flipped), and the `risk_score` spread — plus
-one overall stability number. `eval/runs/` is gitignored; commit the *number*, not the runs.
+`run.mjs` (zero dependencies) runs `claude -p "/boardroom:review --light --stage=…"`
+headless in each neutral copy, with the user's hooks disabled (so style rewriters or
+command proxies don't change what the board sees) and read-only tools only — fixture code
+is never executed. Runs are **appended** to `eval/runs/<fixture>/run-<k>.md`, with
+decision, cost and duration logged to `eval/runs/costs.jsonl`. It stops on the first error
+(e.g. an expired login); re-run to continue. `eval/runs/` is gitignored — commit the
+*number*, not the runs.
+
+Cost: the first real `--light` run (3 hats on Opus) was **$0.81 API-equivalent**, so the
+default 15 runs ≈ $12. On a subscription it comes out of your quota, not your bill.
+`--standard` and `--deep` seat more hats and cost more.
 
 ## Read it
 
 - **Stability (primary).** Per fixture, the share of runs on the modal decision. 100% = the
   board never contradicted itself. Anything lower is the honest reliability number to
   publish — it is the real trustworthiness of the tool.
-- **Accuracy (secondary).** Compare each modal decision to the *Expected* column. A board
-  can be perfectly stable and still wrong; you want both. The fixtures are deliberately
-  easy, so a wrong modal decision here is a red flag.
+- **Accuracy (secondary).** Whether the modal decision is one of the expected ones. A board
+  can be perfectly stable and still wrong; you want both. The fixtures are easy on purpose,
+  so a wrong modal decision here is a red flag.
 - **`risk_score` spread.** A wide spread under a stable decision means the headline holds
   but the severity read wobbles — worth noting.
+- **Cost.** Mean API-equivalent cost per run, per fixture.
 
 ## Honest limits
 
-- This measures the board's **own consistency**, not ground-truth correctness — the
-  fixtures' expected decisions are the only accuracy anchor, and they're easy on purpose.
-  Add harder, real-repo fixtures over time.
+- This measures the board's **own consistency** on easy cases, not correctness in
+  general — add harder, real-repo fixtures over time.
 - **Same base model across hats:** high stability does not rule out a *shared* blind spot
   (that's what the chair's ground-truth anchoring and "same facts, independent framing"
   are for — see `skills/review/SKILL.md`).
-- Temperature and model version move these numbers — record both alongside any result.
+- Model version and the user's global `CLAUDE.md` (still loaded in headless mode) move
+  these numbers — record the model and date alongside any published result.

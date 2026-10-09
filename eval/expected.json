@@ -1,0 +1,18 @@
+{
+  "_comment": "Expected outcomes live here, outside the reviewed fixture folders, so nothing the board reads gives the answer away. First decision = the ideal one; the others are defensible.",
+  "slugify": {
+    "stage": "ga",
+    "expected": ["SHIP", "SHIP_WITH_FIXES"],
+    "why": "tiny, tested, honest util"
+  },
+  "paykit": {
+    "stage": "alpha",
+    "expected": ["NOT_YET"],
+    "why": "hardcoded live secret, double-charge on retry (no idempotency key), failure swallowed and reported as success"
+  },
+  "neuralguard": {
+    "stage": "ga",
+    "expected": ["NEEDS_PROOF", "NOT_YET"],
+    "why": "99.9% / enterprise-ready claims backed by a Math.random() classifier, no tests, no evaluation"
+  }
+}

@@ -7,23 +7,40 @@
 // see "Rating Roulette", arXiv:2510.27106). A board you can trust must first be stable.
 //
 // Usage:
-//   1. Run `/boardroom:review` on each fixture N times (N >= 5).
-//   2. Save each report to eval/runs/<fixture>/run-<k>.md  (one subfolder per fixture).
-//   3. node eval/aggregate.mjs [runsDir]     (default: eval/runs)
+//   1. node eval/run.mjs            (or save reports by hand to eval/runs/<fixture>/run-<k>.md)
+//   2. node eval/aggregate.mjs [runsDir]     (default: eval/runs next to this script)
 //
 // It reads the machine-readable ```yaml summary block from every report and reports,
 // per fixture: the decision distribution, the modal decision, a STABILITY score
-// (modal share, 1.0 = never flipped), and the risk_score spread. No dependencies.
+// (modal share, 1.0 = never flipped), the risk_score spread, whether the modal decision
+// matches eval/expected.json (accuracy — secondary), and the mean cost per run from
+// eval/runs/costs.jsonl when present. No dependencies.
 
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const runsDir = process.argv[2] ?? 'eval/runs';
+const here = dirname(fileURLToPath(import.meta.url));
+const runsDir = process.argv[2] ?? join(here, 'runs');
 
 if (!existsSync(runsDir)) {
   console.error(`No runs directory at "${runsDir}".`);
-  console.error('Create eval/runs/<fixture>/run-<k>.md from your board runs first — see eval/METHODOLOGY.md.');
+  console.error('Run `node eval/run.mjs` first — see eval/METHODOLOGY.md.');
   process.exit(1);
+}
+
+const expectedFile = join(here, 'expected.json');
+const expected = existsSync(expectedFile) ? JSON.parse(readFileSync(expectedFile, 'utf8')) : {};
+
+// Mean cost per run, per fixture, from the runner's log.
+const costs = {};
+const costFile = join(runsDir, 'costs.jsonl');
+if (existsSync(costFile)) {
+  for (const line of readFileSync(costFile, 'utf8').split('\n').filter(Boolean)) {
+    const c = JSON.parse(line);
+    if (typeof c.cost_usd !== 'number') continue;
+    (costs[c.fixture] ??= []).push(c.cost_usd);
+  }
 }
 
 // Pull decision / confidence / risk_score out of the report's ```yaml summary block.
@@ -83,10 +100,19 @@ for (const fx of fixtures.sort()) {
   const stageDist = Object.entries(stageCounts).map(([k, v]) => `${k}×${v}`).join(' ');
   const stageWobble = Object.keys(stageCounts).length > 1;
 
-  rows.push({ fx, n, modalDecision, stability, riskMean, riskSpread, dist, stageDist, stageWobble });
+  // Accuracy (secondary): is the modal decision one of the expected ones?
+  const exp = expected[fx]?.expected ?? null;
+  const correct = exp ? exp.includes(modalDecision) : null;
+
+  const c = costs[fx];
+  const cost = c?.length ? `$${(c.reduce((a, b) => a + b, 0) / c.length).toFixed(2)} mean over ${c.length} run(s)` : '—';
+
+  rows.push({ fx, n, modalDecision, stability, riskMean, riskSpread, dist, stageDist, stageWobble, exp, correct, cost });
 }
 
 const overall = rows.length ? stabilitySum / rows.length : 0;
+const judged = rows.filter((r) => r.correct !== null);
+const accurate = judged.filter((r) => r.correct).length;
 
 // ---- report ----
 const pct = (x) => `${(x * 100).toFixed(0)}%`;
@@ -99,7 +125,11 @@ for (const r of rows) {
   console.log(`  distribution   : ${r.dist}`);
   console.log(`  stage          : ${r.stageDist}${r.stageWobble ? '   ⚠ stage varied — pin it with --stage' : ''}`);
   console.log(`  risk_score     : mean ${r.riskMean}, spread ${r.riskSpread}`);
+  if (r.exp) console.log(`  expected       : ${r.exp.join(' or ')}   ${r.correct ? '✓ modal decision matches' : '✗ modal decision does NOT match'}`);
+  console.log(`  cost           : ${r.cost}`);
 }
 console.log('\n' + '='.repeat(72));
 console.log(`OVERALL DECISION STABILITY: ${pct(overall)}  (mean modal-share across ${rows.length} fixtures)`);
-console.log('Primary metric — higher = more reliable. A fixture < 100% means the board\ngave the same project different verdicts on different runs.\n');
+console.log('Primary metric — higher = more reliable. A fixture < 100% means the board\ngave the same project different verdicts on different runs.');
+if (judged.length) console.log(`ACCURACY (secondary): ${accurate}/${judged.length} fixtures where the modal decision matches eval/expected.json`);
+console.log('');
