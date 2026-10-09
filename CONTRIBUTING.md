@@ -48,9 +48,11 @@ boardroom/
    **Cross-discipline flag:** <trade-off with another discipline, or "none">
    **Hard question for the team:** …
    ```
-   Also carry the shared **Discipline** block (the `[seen]`/`[inferred]` rule,
-   independent scoring, "say unknown, don't guess") — copy it from any existing hat.
-   These feed the chair's verification + confidence layer.
+   Also carry the shared **How to work** block (assigned files only, the
+   `[seen]`/`[inferred]` rule, independent scoring, "say unknown, don't guess") — copy it
+   from any existing hat — and add one line saying what your lens looks for at each
+   **stage** (dev / alpha / beta / ga). These feed the chair's verification, confidence
+   and stage calibration.
 4. Add a row to the board table **and** the smart-assembly rules in
    `skills/review/SKILL.md` so the chair knows when to seat it.
 5. Keep hats **read-only** (`tools: Read, Grep, Glob`) — the board never edits code.

@@ -3,7 +3,7 @@
 **Your project, reviewed by a board of experts — and handed a decision.**
 
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-8A2BE2)](https://docs.claude.com/en/docs/claude-code/plugins)
-[![version](https://img.shields.io/badge/version-0.10.0-green)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.11.0-green)](CHANGELOG.md)
 [![access: read-only](https://img.shields.io/badge/access-read--only-success)](#privacy)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -96,6 +96,7 @@ Or install from the marketplace:
 | Scope to a folder | `/boardroom:review src/` |
 | A rebuttal round on the conflicts | add `--debate` |
 | Judge it for where it is in its lifecycle | `/boardroom:review --stage=beta` |
+| Also run the repo's build / tests as evidence (trusted repos only) | add `--run-checks` |
 
 No flag? The chair auto-sizes the board to the project and infers its stage.
 
@@ -224,11 +225,12 @@ than signal. boardroom guards the verdict:
 - **Unanimity is flagged, not celebrated.** When the board fully agrees, the chair says
   so and names the independent evidence (a real run, a paying user, a benchmark) that
   would confirm it — consensus among same-model reviewers is a caution, not proof.
-- **Findings are anchored to facts, not just opinion.** The chair runs the cheap
-  deterministic checks the repo already declares (build, tests, lint, a secret grep,
-  does-the-cited-line-exist) and demotes any 🔴 that contradicts a green check. LLM
-  reviewers over-flag; ground truth is the cheapest filter for the false positives that
-  are the #1 reason review tools lose trust.
+- **Findings are anchored to facts, not just opinion.** The chair gathers facts a model
+  can't invent — does the cited file exist, a secret grep, are there tests / a lockfile /
+  CI, the last CI status — and demotes any 🔴 that contradicts them. With
+  `--run-checks` it also runs the repo's own build and tests. LLM reviewers over-flag;
+  ground truth is the cheapest filter for the false positives that are the #1 reason
+  review tools lose trust.
 - **Same facts, independent framing.** Every hat gets the same map + ground truth, but
   each is framed in its own discipline's terms — never one shared checklist. Shared
   framing on a shared base model manufactures false consensus.
@@ -259,6 +261,11 @@ Good additions: `board-legal`, `board-data` (privacy/compliance), `board-perf`.
 
 boardroom runs entirely inside your Claude Code session against your local files. It
 adds no network calls of its own and the hats never write to your project.
+
+By default it also **never executes the project's code** — safe to point at a repo you
+don't trust yet (due diligence). `--run-checks` is the one exception: it runs the build,
+test and lint scripts the repo declares, which can do anything that code does (reach the
+network, write files, touch a database). Use it only on repos you trust.
 
 ## License
 

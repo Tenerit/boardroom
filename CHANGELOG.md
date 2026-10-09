@@ -3,6 +3,31 @@
 All notable changes to boardroom. Format follows [Keep a Changelog](https://keepachangelog.com);
 this project uses [semantic versioning](https://semver.org).
 
+## [0.11.0] — 2026-10-09
+### Security
+- **The board no longer executes the reviewed project's code by default.** Since 0.9.0
+  the ground-truth step ran the repo's build and test scripts — which is running untrusted
+  code when you review a repo you don't own yet (due diligence), and contradicted the
+  read-only promise. Ground truth is now gathered without execution (does the cited file
+  exist, a secret grep, tests / lockfile / CI present, last CI status via `gh`, git facts).
+  The new **`--run-checks`** flag opts back into running build / test / lint, for repos
+  you trust. README privacy section says so plainly.
+
+### Changed
+- **Explicit seating order.** Six inputs chose the hats with no precedence (`--hats`,
+  depth, type, intent, stage, the cost rule), so `--light --stage=ga` was ambiguous — and
+  ambiguity shows up as run-to-run variance. Now: `--hats` wins outright; depth sets *how
+  many* seats and the read cap; type and intent decide *who is eligible*; stage decides
+  *who leads* (takes the seats first) and *how harsh* every hat is.
+- **Prompts consolidated, no behaviour change.** The chair's instructions had grown from
+  1,554 words (v0.6) to 3,555; duplicated rules are merged and the Rules section no
+  longer restates the procedure — now 2,476 words (−30%). Each hat lost ~80 words of
+  boilerplate (shared "How to work" block, shorter contract lines). Fewer tokens per run,
+  and fewer rules for the model to half-follow.
+- The skill's trigger description mentions stage ("is my prototype on track?", "ready
+  for beta / launch?"); the marketplace manifest gains the top-level `description` the
+  validator asked for.
+
 ## [0.10.0] — 2026-10-09
 ### Added — stage-aware review (dev · alpha · beta · ga)
 - **The board now judges a project for its lifecycle stage.** The chair infers the stage
